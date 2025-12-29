@@ -3,252 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borang Kehadiran Mesyuarat ALK - Cloud</title>
+    <title>Sistem Kehadiran Mesyuarat ALK 2025 - Koperasi Adham</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Corporate Trust (Slate, White, and Royal Blue) -->
+    
+    <!-- Application Structure Plan: 
+         Reka bentuk SPA ini menggunakan pendekatan "Dashboard First". 
+         1. Paparan Utama (Dashboard): Menyajikan maklumat kritikal mesyuarat (Tarikh, Masa, Tempat) dan status kehadiran semasa secara visual.
+         2. Modal Pendaftaran: Borang terapung (overlay) digunakan untuk pendaftaran supaya pengguna tidak kehilangan konteks latar belakang.
+         3. Panel Admin Terlindung: Bahagian admin disembunyikan dan hanya muncul selepas log masuk yang sah. Ia mengandungi visualisasi data (Carta) dan jadual pengurusan.
+         Reka bentuk ini dipilih untuk memaksimumkan kebolehgunaan; ahli biasa melihat maklumat ringkas manakala admin mendapat analisis mendalam dalam satu halaman.
+    -->
+    
+    <!-- Visualization & Content Choices: 
+         1. Info Grid: Maklumat teks dari laporan dipecahkan kepada kad ikonik (Goal: Inform).
+         2. Bar Chart (Chart.js): Digunakan di Admin Panel untuk membandingkan jumlah kehadiran mengikut Jawatan (Goal: Compare).
+         3. Live Counter: Penunjuk nombor besar dengan bar kemajuan masa nyata (Goal: Inform/Engage).
+         4. Tandatangan Digital: Canvas HTML5 untuk input tandatangan intuitif (Goal: Input).
+         Justifikasi: Penggunaan Chart.js memastikan visualisasi data yang bersih dan responsif tanpa menggunakan SVG luaran.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #334155; }
+        
+        /* Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
         }
-        .signature-pad {
-            border: 2px dashed #cbd5e1;
-            border-radius: 0.5rem;
-            cursor: crosshair;
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .signature-box {
             background-color: #ffffff;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+            cursor: crosshair;
         }
-        .loading-overlay {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(2px);
-        }
-        .logo-blend {
-            mix-blend-mode: multiply;
-        }
+
+        /* Utility for print layout */
         @media print {
-            .no-print {
-                display: none;
-            }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; }
+            .glass-card { box-shadow: none; border: 1px solid #ddd; }
         }
+        
+        /* Table scrollbar */
+        .table-scroll::-webkit-scrollbar { height: 6px; }
+        .table-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+        .table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- Loading Indicator -->
-    <div id="loading" class="fixed inset-0 z-[100] flex items-center justify-center loading-overlay hidden">
-        <div class="flex flex-col items-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900"></div>
-            <p class="mt-4 text-blue-900 font-medium">Sedang memproses...</p>
+    <!-- HERO SECTION / HEADER -->
+    <div class="bg-slate-900 text-white pb-24 pt-12 px-4 no-print relative overflow-hidden">
+        <div class="absolute top-0 right-0 opacity-10 text-[200px] font-bold leading-none select-none pointer-events-none">2025</div>
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="inline-block p-4 bg-white rounded-2xl shadow-xl mb-6 logo-blend">
+                <img src="https://i.postimg.cc/yNSrvgJJ/Logo-Koperasi-Adham-Al-Husainy-Berhad.png" 
+                     alt="Logo Koperasi" class="h-20 md:h-24 object-contain">
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight">MESYUARAT ANGGOTA LEMBAGA</h1>
+            <p class="text-blue-200 text-lg md:text-xl font-medium uppercase tracking-wide">Koperasi Adham Al-Husainy Berhad Bil.01/2025</p>
         </div>
     </div>
 
-    <!-- Header Section -->
-    <header class="bg-blue-50 text-blue-900 py-10 px-4 shadow-sm mb-8 border-b border-blue-100">
-        <div class="max-w-3xl mx-auto text-center">
-            <img src="https://i.postimg.cc/yNSrvgJJ/Logo-Koperasi-Adham-Al-Husainy-Berhad.png" 
-                 alt="Logo Koperasi Adham Al-Husainy Berhad" 
-                 class="mx-auto h-24 md:h-32 mb-6 logo-blend">
-                 
-            <h1 class="text-2xl md:text-3xl font-bold mb-2 uppercase tracking-tight">Mesyuarat Anggota Lembaga</h1>
-            <h2 class="text-xl md:text-2xl font-semibold text-blue-700 mb-6 uppercase">Koperasi Adham Al-Husainy Berhad Bil.01/2025</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm md:text-base border-t border-blue-200 pt-6">
-                <div class="flex flex-col">
-                    <span class="text-blue-500 uppercase text-xs font-bold tracking-wider">Tarikh</span>
-                    <span class="font-medium">30 DISEMBER 2025 (SELASA)</span>
-                </div>
-                <div class="flex flex-col">
-                    <span class="text-blue-500 uppercase text-xs font-bold tracking-wider">Masa</span>
-                    <span class="font-medium">08:30 MALAM</span>
-                </div>
-                <div class="flex flex-col">
-                    <span class="text-blue-500 uppercase text-xs font-bold tracking-wider">Tempat</span>
-                    <span class="font-medium text-xs md:text-sm">657 JALAN STESEN, SUNGAI BAKAP<br>14200 SUNGAI JAWI</span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="flex-grow max-w-2xl mx-auto px-4 w-full">
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow px-4 -mt-16 pb-12 w-full max-w-5xl mx-auto z-20 relative">
         
-        <!-- Registration Form -->
-        <div id="registrationForm" class="bg-white rounded-xl shadow-md p-6 md:p-8 border border-gray-100">
-            <div class="flex justify-between items-center mb-6 border-b pb-2">
-                <h3 class="text-xl font-bold text-gray-800">Pendaftaran Kehadiran</h3>
-                <span id="statusBadge" class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold uppercase tracking-widest">Sistem Aktif</span>
-            </div>
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboardView" class="grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300">
             
-            <form id="attendanceForm" class="space-y-5">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Penuh</label>
-                    <input type="text" id="name" required placeholder="Masukkan nama penuh"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jawatan</label>
-                    <input type="text" id="position" required placeholder="Contoh: Pengerusi / Setiausaha / ALK"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none">
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">No. Telefon</label>
-                        <input type="tel" id="phone" required placeholder="012-3456789"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none">
+            <!-- LEFT COLUMN: Butiran Mesyuarat -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="glass-card rounded-2xl p-6 md:p-8">
+                    <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+                        <h2 class="text-xl font-bold text-slate-800">📋 Butiran Mesyuarat</h2>
+                        <span id="systemStatus" class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full uppercase">Menyambung...</span>
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                        <input type="email" id="email" required placeholder="nama@email.com"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none">
+                    <p class="text-slate-600 mb-6">
+                        Selamat datang ke portal kehadiran digital rasmi. Laman ini memaparkan maklumat terkini mesyuarat dan membolehkan Anggota Lembaga (ALK) merekodkan kehadiran secara masa nyata untuk tujuan dokumentasi rasmi.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 hover:bg-blue-50 transition-colors">
+                            <div class="text-2xl mb-2">📅</div>
+                            <div class="text-xs font-bold text-blue-600 uppercase tracking-wider">Tarikh</div>
+                            <div class="font-bold text-slate-800 text-lg">30 DISEMBER</div>
+                            <div class="text-sm text-slate-500">2025 (SELASA)</div>
+                        </div>
+                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 hover:bg-blue-50 transition-colors">
+                            <div class="text-2xl mb-2">⏰</div>
+                            <div class="text-xs font-bold text-blue-600 uppercase tracking-wider">Masa</div>
+                            <div class="font-bold text-slate-800 text-lg">08:30 MALAM</div>
+                            <div class="text-sm text-slate-500">Waktu Malaysia</div>
+                        </div>
+                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 hover:bg-blue-50 transition-colors">
+                            <div class="text-2xl mb-2">📍</div>
+                            <div class="text-xs font-bold text-blue-600 uppercase tracking-wider">Tempat</div>
+                            <div class="font-bold text-slate-800 text-sm leading-tight mb-1">657 JALAN STESEN,<br>SUNGAI BAKAP</div>
+                            <div class="text-xs text-slate-500">14200 SUNGAI JAWI</div>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tandatangan</label>
-                    <div class="relative">
-                        <canvas id="signaturePad" class="signature-pad w-full h-40"></canvas>
-                        <button type="button" id="clearBtn" class="absolute top-2 right-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs py-1 px-2 rounded transition-colors">
-                            Padam
-                        </button>
+                <button onclick="openModal('regModal')" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1 flex items-center justify-between group no-print">
+                    <div class="text-left">
+                        <div class="text-lg">✍ REKOD KEHADIRAN</div>
+                        <div class="text-blue-200 text-xs font-normal">Klik di sini untuk mendaftar masuk</div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1 italic">*Sila tandatangan di dalam petak di atas</p>
-                </div>
-
-                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow transition-all transform active:scale-95 flex items-center justify-center">
-                    <span>Hantar Kehadiran</span>
+                    <div class="text-2xl bg-white/20 w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-white/30">➜</div>
                 </button>
-            </form>
-        </div>
-
-        <!-- Success Message -->
-        <div id="successMsg" class="hidden bg-white rounded-xl shadow-md p-10 text-center border border-green-100">
-            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                </svg>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800">Terima Kasih!</h3>
-            <p class="text-gray-600 mt-2">Kehadiran anda telah berjaya disimpan ke pangkalan data awan.</p>
-            <button onclick="window.location.reload()" class="mt-6 text-blue-600 font-medium hover:underline">Daftar kehadiran baru</button>
-        </div>
 
-        <!-- Admin Login Modal -->
-        <div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-sm:w-11/12 max-w-sm">
-                <h3 class="text-lg font-bold mb-4 text-blue-900">Akses Admin</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm mb-1 font-medium text-gray-700">Username</label>
-                        <input type="text" id="adminUser" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-1 font-medium text-gray-700">Password</label>
-                        <input type="password" id="adminPass" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                    </div>
-                    <div id="loginError" class="text-red-500 text-xs hidden">Username atau password salah!</div>
-                    <div class="flex space-x-2 pt-2">
-                        <button id="doLoginBtn" class="flex-1 bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition-colors">Log Masuk</button>
-                        <button id="cancelLoginBtn" class="flex-1 bg-gray-200 py-2 rounded font-semibold hover:bg-gray-300 transition-colors">Batal</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Admin Dashboard (Hidden) -->
-        <div id="adminDashboard" class="hidden mt-8 mb-12">
-            <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 no-print gap-4">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-800">Senarai Kehadiran (Awan)</h3>
-                        <p class="text-xs text-gray-500" id="lastUpdated">Mengemas kini...</p>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button onclick="window.print()" class="bg-green-600 text-white px-4 py-2 rounded text-sm font-medium">Cetak PDF</button>
-                        <button id="doLogoutBtn" class="bg-red-50 text-red-600 px-4 py-2 rounded text-sm font-medium border border-red-200">Log Keluar</button>
-                    </div>
+            <!-- RIGHT COLUMN: Statistik Langsung -->
+            <aside class="glass-card rounded-2xl p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Status Kehadiran Semasa</h3>
+                
+                <div class="relative mb-4">
+                    <span class="text-7xl font-black text-slate-800 tracking-tighter" id="liveCount">0</span>
+                    <span class="absolute top-0 right-0 flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
                 </div>
                 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[600px]">
+                <p class="text-sm text-slate-500 mb-6">Anggota telah mendaftar masuk.</p>
+                
+                <div class="w-full bg-slate-100 rounded-full h-2 mb-2 overflow-hidden">
+                    <div id="liveProgress" class="bg-blue-600 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between w-full text-[10px] text-slate-400 font-bold uppercase">
+                    <span>Mula</span>
+                    <span>Sasaran</span>
+                </div>
+            </aside>
+        </div>
+
+        <!-- ADMIN PANEL VIEW -->
+        <div id="adminPanel" class="hidden space-y-6 mt-6 transition-all duration-300">
+            <div class="bg-slate-800 text-white p-6 rounded-2xl shadow-lg flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-bold">🔒 Panel Admin</h2>
+                    <p class="text-slate-400 text-sm">Pengurusan data kehadiran dan analisis.</p>
+                </div>
+                <div class="flex gap-3 no-print">
+                    <button onclick="window.print()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors">🖨 Cetak</button>
+                    <button onclick="logout()" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors">Log Keluar</button>
+                </div>
+            </div>
+
+            <!-- Visualisasi Analisis -->
+            <section class="glass-card p-6 rounded-2xl no-print">
+                <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">Analisis Mengikut Jawatan</h3>
+                <p class="text-sm text-slate-500 mb-6">Carta ini memaparkan taburan kehadiran berdasarkan jawatan yang didaftarkan secara dinamik.</p>
+                <div class="chart-container">
+                    <canvas id="positionChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Jadual Data Penuh -->
+            <section class="glass-card p-6 rounded-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-700">Senarai Kehadiran Penuh</h3>
+                    <span id="lastUpdated" class="text-xs text-slate-400 italic">Dikemas kini: -</span>
+                </div>
+                
+                <div class="overflow-x-auto table-scroll">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
-                            <tr class="bg-gray-50 text-gray-600 text-sm uppercase">
-                                <th class="p-3 border-b">Bil</th>
-                                <th class="p-3 border-b">Nama</th>
-                                <th class="p-3 border-b">Jawatan</th>
-                                <th class="p-3 border-b">No. Tel / Email</th>
-                                <th class="p-3 border-b">Tandatangan</th>
-                                <th class="p-3 border-b no-print">Tindakan</th>
+                            <tr class="text-xs font-bold text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
+                                <th class="py-3 px-4">#</th>
+                                <th class="py-3 px-4">Nama</th>
+                                <th class="py-3 px-4">Jawatan</th>
+                                <th class="py-3 px-4">Hubungan</th>
+                                <th class="py-3 px-4 text-center">T/Tangan</th>
+                                <th class="py-3 px-4 text-right no-print">Tindakan</th>
                             </tr>
                         </thead>
-                        <tbody id="attendanceTableBody"></tbody>
+                        <tbody id="dataTableBody" class="text-sm text-slate-700"></tbody>
                     </table>
                 </div>
-                <div id="noData" class="text-center py-8 text-gray-500 hidden">Tiada rekod dijumpai di pangkalan data.</div>
-            </div>
+                <div id="noDataMsg" class="hidden text-center py-8 text-slate-400">Tiada rekod dijumpai dalam pangkalan data.</div>
+            </section>
         </div>
     </main>
 
-    <!-- Footer Section -->
-    <footer class="bg-white border-t border-gray-200 py-6 mt-auto no-print">
-        <div class="max-w-2xl mx-auto px-4 text-center">
-            <p class="text-gray-500 text-sm">
-                &copy; 2025 Koperasi Adham Al-Husainy Berhad. Hak Cipta Terpelihara.
-            </p>
-            <button id="adminLoginLink" class="mt-2 text-gray-300 text-[10px] hover:text-gray-500 transition-colors uppercase tracking-widest font-bold">
-                Log Masuk Admin
-            </button>
-        </div>
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-8 mt-auto text-center no-print">
+        <p class="text-slate-400 text-xs mb-2">&copy; 2025 Koperasi Adham Al-Husainy Berhad. Hak Cipta Terpelihara.</p>
+        <button onclick="openModal('loginModal')" class="text-[10px] font-bold text-slate-300 hover:text-slate-500 uppercase tracking-widest transition-colors">
+            Akses Admin
+        </button>
     </footer>
 
-    <!-- Firebase SDKs -->
+    <!-- MODAL: BORANG PENDAFTARAN -->
+    <div id="regModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity" onclick="closeModal('regModal')"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto flex flex-col">
+                <div class="p-5 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+                    <h3 class="font-bold text-lg text-slate-800">Borang Kehadiran</h3>
+                    <button onclick="closeModal('regModal')" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+                </div>
+                
+                <form id="attendForm" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Penuh</label>
+                        <input type="text" id="inpName" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all" placeholder="Masukkan nama penuh">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jawatan</label>
+                        <select id="inpPos" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all">
+                            <option value="" disabled selected>Pilih Jawatan</option>
+                            <option value="Pengerusi">Pengerusi</option>
+                            <option value="Setiausaha">Setiausaha</option>
+                            <option value="Bendahari">Bendahari</option>
+                            <option value="ALK">Anggota Lembaga (ALK)</option>
+                            <option value="Pemeriksa Kira-Kira">Pemeriksa Kira-Kira</option>
+                            <option value="Lain-lain">Lain-lain</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Telefon</label>
+                            <input type="tel" id="inpPhone" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="01x-xxxxxxx">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Emel</label>
+                            <input type="email" id="inpEmail" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="nama@mail.com">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Tandatangan</label>
+                            <button type="button" id="clearSig" class="text-xs text-red-500 hover:text-red-700 underline">Padam</button>
+                        </div>
+                        <div class="border-2 border-dashed border-slate-300 rounded-xl h-32 w-full overflow-hidden relative signature-box">
+                            <canvas id="sigCanvas" class="w-full h-full"></canvas>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg mt-4 flex justify-center items-center gap-2 transition-all active:scale-95">
+                        <span>Hantar Kehadiran</span>
+                        <div id="spinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: LOG MASUK ADMIN -->
+    <div id="loginModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" onclick="closeModal('loginModal')"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8 text-center">
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🔐</div>
+                <h3 class="font-bold text-xl text-slate-800 mb-2">Akses Admin</h3>
+                <p class="text-sm text-slate-500 mb-6">Sila masukkan maklumat log masuk anda.</p>
+                <div class="space-y-3">
+                    <input type="text" id="admUser" placeholder="Username" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <input type="password" id="admPass" placeholder="Password" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <p id="loginErr" class="hidden text-xs text-red-500 font-bold">Maklumat tidak sah.</p>
+                </div>
+                <div class="mt-6 flex gap-3">
+                    <button onclick="attemptLogin()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Masuk</button>
+                    <button onclick="closeModal('loginModal')" class="flex-1 bg-slate-100 text-slate-600 py-2 rounded-lg font-bold hover:bg-slate-200">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE MODULE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global Config
-        const firebaseConfig = JSON.parse(__firebase_config);
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdRqF-OMKS4I7gmiJezid0hl3gUOUTOLY",
+            authDomain: "kehadiran-mesyuarat-koadham.firebaseapp.com",
+            projectId: "kehadiran-mesyuarat-koadham",
+            storageBucket: "kehadiran-mesyuarat-koadham.firebasestorage.app",
+            messagingSenderId: "159418583096",
+            appId: "1:159418583096:web:e6cc1155d3b1f426003ecd",
+            measurementId: "G-VJKVPEM18K"
+        };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'koperasi-adham-2025';
+        const APP_ID_PATH = 'koperasi-adham-2025'; 
 
-        // State
         let currentUser = null;
         let attendanceData = [];
-        let unsubscribe = null;
+        let chartInstance = null;
+        let dataUnsubscribe = null;
 
-        // --- AUTH ---
+        // AUTH INITIALIZATION DENGAN PENGENDALIAN RALAT TOKEN
         const initAuth = async () => {
+            const statusEl = document.getElementById('systemStatus');
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
+                const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                if (token) {
+                    try {
+                        await signInWithCustomToken(auth, token);
+                    } catch (tokenErr) {
+                        // Jika token mismatch atau tidak sah, fallback ke anonymous
+                        await signInAnonymously(auth);
+                    }
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (error) {
-                console.error("Auth Error:", error);
-                document.getElementById('statusBadge').textContent = "Offline";
+            } catch (err) {
+                console.error("Auth Error", err);
+                statusEl.textContent = "OFFLINE";
+                statusEl.className = "px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase";
             }
         };
 
-        onAuthStateChanged(auth, (user) => { currentUser = user; });
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            const statusEl = document.getElementById('systemStatus');
+            if(user) {
+                statusEl.textContent = "ONLINE";
+                statusEl.className = "px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase";
+                startDataListener(); 
+            }
+        });
 
-        // --- SIGNATURE CANVAS ---
-        const canvas = document.getElementById('signaturePad');
+        function startDataListener() {
+            if (dataUnsubscribe) dataUnsubscribe();
+            const colRef = collection(db, 'artifacts', APP_ID_PATH, 'public', 'data', 'attendance');
+            
+            dataUnsubscribe = onSnapshot(colRef, (snapshot) => {
+                attendanceData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                attendanceData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                updateDashboard();
+                if(!document.getElementById('adminPanel').classList.contains('hidden')) {
+                    renderAdminTable();
+                    updateChart();
+                }
+            }, (err) => console.error("Data Listener Error:", err));
+        }
+
+        function updateDashboard() {
+            const count = attendanceData.length;
+            document.getElementById('liveCount').textContent = count;
+            const pct = Math.min((count / 30) * 100, 100);
+            document.getElementById('liveProgress').style.width = `${pct}%`;
+        }
+
+        // CANVAS LOGIC
+        const canvas = document.getElementById('sigCanvas');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
 
         function resizeCanvas() {
-            const ratio = Math.max(window.devicePixelRatio || 1, 1);
             const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * ratio;
-            canvas.height = rect.height * ratio;
-            ctx.scale(ratio, ratio);
+            canvas.width = rect.width;
+            canvas.height = rect.height;
         }
-
         window.addEventListener('resize', resizeCanvas);
-        setTimeout(resizeCanvas, 200);
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
@@ -257,135 +395,177 @@
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
-        const startDrawing = (e) => {
-            isDrawing = true;
-            const pos = getPos(e);
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
-            if (e.touches) e.preventDefault();
-        };
+        ['mousedown', 'touchstart'].forEach(evt => 
+            canvas.addEventListener(evt, (e) => {
+                isDrawing = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                if(e.type === 'touchstart') e.preventDefault();
+            }, {passive: false})
+        );
 
-        const draw = (e) => {
-            if (!isDrawing) return;
-            const pos = getPos(e);
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = '#000';
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
-            if (e.touches) e.preventDefault();
-        };
+        ['mousemove', 'touchmove'].forEach(evt => 
+            canvas.addEventListener(evt, (e) => {
+                if(!isDrawing) return;
+                const pos = getPos(e);
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = '#000';
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                if(e.type === 'touchmove') e.preventDefault();
+            }, {passive: false})
+        );
 
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        window.addEventListener('mouseup', () => isDrawing = false);
-        canvas.addEventListener('touchstart', startDrawing);
-        canvas.addEventListener('touchmove', draw);
-        window.addEventListener('touchend', () => isDrawing = false);
-        document.getElementById('clearBtn').onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ['mouseup', 'touchend'].forEach(evt => 
+            window.addEventListener(evt, () => isDrawing = false)
+        );
 
-        // --- SUBMISSION ---
-        document.getElementById('attendanceForm').onsubmit = async (e) => {
+        document.getElementById('clearSig').onclick = () => ctx.clearRect(0,0, canvas.width, canvas.height);
+
+        // FORM HANDLER
+        document.getElementById('attendForm').onsubmit = async (e) => {
             e.preventDefault();
-            if (!currentUser) return alert("Sila tunggu sambungan sistem.");
-            
+            if(!currentUser) return alert("Sila tunggu sambungan sistem.");
+
             const blank = document.createElement('canvas');
             blank.width = canvas.width; blank.height = canvas.height;
-            if (canvas.toDataURL() === blank.toDataURL()) return alert("Sila tandatangan.");
+            if(canvas.toDataURL() === blank.toDataURL()) return alert("Sila turunkan tandatangan.");
 
-            document.getElementById('loading').classList.remove('hidden');
+            const btn = document.getElementById('submitBtn');
+            const spin = document.getElementById('spinner');
+            btn.disabled = true;
+            spin.classList.remove('hidden');
+
             try {
-                const data = {
-                    name: document.getElementById('name').value,
-                    position: document.getElementById('position').value,
-                    phone: document.getElementById('phone').value,
-                    email: document.getElementById('email').value,
+                const payload = {
+                    name: document.getElementById('inpName').value,
+                    position: document.getElementById('inpPos').value,
+                    phone: document.getElementById('inpPhone').value,
+                    email: document.getElementById('inpEmail').value,
                     signature: canvas.toDataURL(),
                     createdAt: serverTimestamp(),
                     userId: currentUser.uid
                 };
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), data);
-                document.getElementById('registrationForm').classList.add('hidden');
-                document.getElementById('successMsg').classList.remove('hidden');
-            } catch (err) { alert("Gagal hantar data."); }
-            document.getElementById('loading').classList.add('hidden');
-        };
 
-        // --- ADMIN CONTROLS (USING EVENT LISTENERS) ---
-        const toggleModal = () => {
-            const modal = document.getElementById('adminLoginModal');
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) document.getElementById('adminUser').focus();
-        };
-
-        document.getElementById('adminLoginLink').addEventListener('click', toggleModal);
-        document.getElementById('cancelLoginBtn').addEventListener('click', toggleModal);
-
-        document.getElementById('doLoginBtn').addEventListener('click', () => {
-            const user = document.getElementById('adminUser').value;
-            const pass = document.getElementById('adminPass').value;
-            if (user === 'Admin' && pass === 'Admin123') {
-                toggleModal();
-                document.getElementById('registrationForm').classList.add('hidden');
-                document.getElementById('successMsg').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                startDataListener();
-            } else {
-                document.getElementById('loginError').classList.remove('hidden');
+                await addDoc(collection(db, 'artifacts', APP_ID_PATH, 'public', 'data', 'attendance'), payload);
+                
+                closeModal('regModal');
+                e.target.reset();
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+                alert("Kehadiran berjaya direkodkan!");
+            } catch (err) {
+                console.error(err);
+                alert("Gagal menyimpan data.");
+            } finally {
+                btn.disabled = false;
+                spin.classList.add('hidden');
             }
-        });
+        };
 
-        document.getElementById('doLogoutBtn').addEventListener('click', () => {
-            if (unsubscribe) unsubscribe();
-            document.getElementById('adminDashboard').classList.add('hidden');
-            document.getElementById('registrationForm').classList.remove('hidden');
-            document.getElementById('adminUser').value = '';
-            document.getElementById('adminPass').value = '';
-        });
-
-        function startDataListener() {
-            document.getElementById('loading').classList.remove('hidden');
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
-            unsubscribe = onSnapshot(colRef, (snap) => {
-                attendanceData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                attendanceData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-                renderTable();
-                document.getElementById('lastUpdated').textContent = `Kemas kini: ${new Date().toLocaleTimeString()}`;
-                document.getElementById('loading').classList.add('hidden');
+        // ANALYTICS CHART
+        function updateChart() {
+            const ctxChart = document.getElementById('positionChart').getContext('2d');
+            const counts = {};
+            attendanceData.forEach(d => {
+                const p = d.position || 'Lain-lain';
+                counts[p] = (counts[p] || 0) + 1;
             });
+            const labels = Object.keys(counts);
+            const vals = Object.values(counts);
+
+            if(chartInstance) {
+                chartInstance.data.labels = labels;
+                chartInstance.data.datasets[0].data = vals;
+                chartInstance.update();
+            } else {
+                chartInstance = new Chart(ctxChart, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Bilangan',
+                            data: vals,
+                            backgroundColor: 'rgba(37, 99, 235, 0.6)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                    }
+                });
+            }
         }
 
-        function renderTable() {
-            const tbody = document.getElementById('attendanceTableBody');
+        // ADMIN UI
+        function renderAdminTable() {
+            const tbody = document.getElementById('dataTableBody');
             tbody.innerHTML = '';
-            if (attendanceData.length === 0) {
-                document.getElementById('noData').classList.remove('hidden');
+            
+            if(attendanceData.length === 0) {
+                document.getElementById('noDataMsg').classList.remove('hidden');
                 return;
             }
-            document.getElementById('noData').classList.add('hidden');
+            document.getElementById('noDataMsg').classList.add('hidden');
+
             attendanceData.forEach((item, i) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 text-sm";
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
                 tr.innerHTML = `
-                    <td class="p-3 border-b text-gray-500">${i+1}</td>
-                    <td class="p-3 border-b font-medium">${item.name}</td>
-                    <td class="p-3 border-b">${item.position}</td>
-                    <td class="p-3 border-b text-xs">${item.phone}<br><span class="text-blue-600">${item.email}</span></td>
-                    <td class="p-3 border-b"><img src="${item.signature}" class="h-10 border bg-white"></td>
-                    <td class="p-3 border-b no-print">
-                        <button onclick="window.deleteEntry('${item.id}')" class="text-red-500">
-                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
-                        </button>
+                    <td class="py-3 px-4 text-slate-400 font-mono text-xs">${i+1}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-700">${item.name}</td>
+                    <td class="py-3 px-4"><span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold">${item.position}</span></td>
+                    <td class="py-3 px-4 text-xs text-slate-500">
+                        <div>${item.phone}</div>
+                        <div class="text-blue-500">${item.email}</div>
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <img src="${item.signature}" class="h-8 mx-auto border bg-white rounded cursor-pointer hover:scale-150 transition-transform">
+                    </td>
+                    <td class="py-3 px-4 text-right no-print">
+                        <button onclick="window.delEntry('${item.id}')" class="text-slate-300 hover:text-red-500 transition-colors">🗑</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+            document.getElementById('lastUpdated').textContent = `Kemas kini: ${new Date().toLocaleTimeString()}`;
         }
 
-        window.deleteEntry = async (id) => {
-            if (confirm('Padam rekod ini?')) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'attendance', id));
+        window.delEntry = async (id) => {
+            if(confirm("Adakah anda pasti mahu memadam rekod ini?")) {
+                await deleteDoc(doc(db, 'artifacts', APP_ID_PATH, 'public', 'data', 'attendance', id));
             }
+        };
+
+        window.openModal = (id) => {
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'regModal') setTimeout(resizeCanvas, 200);
+        };
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+
+        window.attemptLogin = () => {
+            const u = document.getElementById('admUser').value;
+            const p = document.getElementById('admPass').value;
+            if(u === 'Admin' && p === 'Admin123') {
+                closeModal('loginModal');
+                document.getElementById('dashboardView').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                updateChart();
+                renderAdminTable();
+            } else {
+                document.getElementById('loginErr').classList.remove('hidden');
+            }
+        };
+
+        window.logout = () => {
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('dashboardView').classList.remove('hidden');
         };
 
         initAuth();
