@@ -21,7 +21,6 @@
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(2px);
         }
-        /* Menggunakan blend mode untuk "menghilangkan" background putih pada logo jika ada */
         .logo-blend {
             mix-blend-mode: multiply;
         }
@@ -42,14 +41,12 @@
         </div>
     </div>
 
-    <!-- Header Section (Warna Biru Cair) -->
+    <!-- Header Section -->
     <header class="bg-blue-50 text-blue-900 py-10 px-4 shadow-sm mb-8 border-b border-blue-100">
         <div class="max-w-3xl mx-auto text-center">
-            <!-- Logo Section dengan Blend Mode -->
             <img src="https://i.postimg.cc/yNSrvgJJ/Logo-Koperasi-Adham-Al-Husainy-Berhad.png" 
                  alt="Logo Koperasi Adham Al-Husainy Berhad" 
-                 class="mx-auto h-24 md:h-32 mb-6 logo-blend"
-                 onerror="this.onerror=null; this.alt='Logo Tidak Ditemui';">
+                 class="mx-auto h-24 md:h-32 mb-6 logo-blend">
                  
             <h1 class="text-2xl md:text-3xl font-bold mb-2 uppercase tracking-tight">Mesyuarat Anggota Lembaga</h1>
             <h2 class="text-xl md:text-2xl font-semibold text-blue-700 mb-6 uppercase">Koperasi Adham Al-Husainy Berhad Bil.01/2025</h2>
@@ -123,7 +120,7 @@
             </form>
         </div>
 
-        <!-- Success Message (Hidden) -->
+        <!-- Success Message -->
         <div id="successMsg" class="hidden bg-white rounded-xl shadow-md p-10 text-center border border-green-100">
             <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,8 +147,8 @@
                     </div>
                     <div id="loginError" class="text-red-500 text-xs hidden">Username atau password salah!</div>
                     <div class="flex space-x-2 pt-2">
-                        <button onclick="loginAdmin()" class="flex-1 bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition-colors">Log Masuk</button>
-                        <button onclick="toggleAdminLogin()" class="flex-1 bg-gray-200 py-2 rounded font-semibold hover:bg-gray-300 transition-colors">Batal</button>
+                        <button id="doLoginBtn" class="flex-1 bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition-colors">Log Masuk</button>
+                        <button id="cancelLoginBtn" class="flex-1 bg-gray-200 py-2 rounded font-semibold hover:bg-gray-300 transition-colors">Batal</button>
                     </div>
                 </div>
             </div>
@@ -167,7 +164,7 @@
                     </div>
                     <div class="flex space-x-2">
                         <button onclick="window.print()" class="bg-green-600 text-white px-4 py-2 rounded text-sm font-medium">Cetak PDF</button>
-                        <button onclick="logoutAdmin()" class="bg-red-50 text-red-600 px-4 py-2 rounded text-sm font-medium border border-red-200">Log Keluar</button>
+                        <button id="doLogoutBtn" class="bg-red-50 text-red-600 px-4 py-2 rounded text-sm font-medium border border-red-200">Log Keluar</button>
                     </div>
                 </div>
                 
@@ -183,9 +180,7 @@
                                 <th class="p-3 border-b no-print">Tindakan</th>
                             </tr>
                         </thead>
-                        <tbody id="attendanceTableBody">
-                            <!-- Content loaded from Firestore -->
-                        </tbody>
+                        <tbody id="attendanceTableBody"></tbody>
                     </table>
                 </div>
                 <div id="noData" class="text-center py-8 text-gray-500 hidden">Tiada rekod dijumpai di pangkalan data.</div>
@@ -199,8 +194,7 @@
             <p class="text-gray-500 text-sm">
                 &copy; 2025 Koperasi Adham Al-Husainy Berhad. Hak Cipta Terpelihara.
             </p>
-            <!-- Link Admin Login dipindahkan ke bawah hak cipta -->
-            <button onclick="toggleAdminLogin()" class="mt-2 text-gray-300 text-[10px] hover:text-gray-500 transition-colors uppercase tracking-widest font-bold">
+            <button id="adminLoginLink" class="mt-2 text-gray-300 text-[10px] hover:text-gray-500 transition-colors uppercase tracking-widest font-bold">
                 Log Masuk Admin
             </button>
         </div>
@@ -212,7 +206,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global Firebase Configuration
+        // Global Config
         const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -224,13 +218,7 @@
         let attendanceData = [];
         let unsubscribe = null;
 
-        // UI Elements
-        const loading = document.getElementById('loading');
-        const canvas = document.getElementById('signaturePad');
-        const ctx = canvas.getContext('2d');
-        let isDrawing = false;
-
-        // --- AUTHENTICATION ---
+        // --- AUTH ---
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -240,16 +228,17 @@
                 }
             } catch (error) {
                 console.error("Auth Error:", error);
-                document.getElementById('statusBadge').textContent = "Ralat Sambungan";
-                document.getElementById('statusBadge').className = "text-[10px] bg-red-100 text-red-700 px-2 py-1 rounded-full font-bold uppercase tracking-widest";
+                document.getElementById('statusBadge').textContent = "Offline";
             }
         };
 
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-        });
+        onAuthStateChanged(auth, (user) => { currentUser = user; });
 
-        // --- SIGNATURE LOGIC ---
+        // --- SIGNATURE CANVAS ---
+        const canvas = document.getElementById('signaturePad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
         function resizeCanvas() {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
             const rect = canvas.getBoundingClientRect();
@@ -259,31 +248,24 @@
         }
 
         window.addEventListener('resize', resizeCanvas);
-        setTimeout(resizeCanvas, 100);
+        setTimeout(resizeCanvas, 200);
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            if (e.touches && e.touches[0]) {
-                return {
-                    x: e.touches[0].clientX - rect.left,
-                    y: e.touches[0].clientY - rect.top
-                };
-            }
-            return {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top
-            };
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
-        function startDrawing(e) {
+        const startDrawing = (e) => {
             isDrawing = true;
             const pos = getPos(e);
             ctx.beginPath();
             ctx.moveTo(pos.x, pos.y);
-            if (e.type === 'touchstart') e.preventDefault();
-        }
+            if (e.touches) e.preventDefault();
+        };
 
-        function draw(e) {
+        const draw = (e) => {
             if (!isDrawing) return;
             const pos = getPos(e);
             ctx.lineWidth = 2;
@@ -291,38 +273,27 @@
             ctx.strokeStyle = '#000';
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
-            if (e.type === 'touchmove') e.preventDefault();
-        }
-
-        function stopDrawing() {
-            isDrawing = false;
-        }
+            if (e.touches) e.preventDefault();
+        };
 
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
-        window.addEventListener('mouseup', stopDrawing);
+        window.addEventListener('mouseup', () => isDrawing = false);
         canvas.addEventListener('touchstart', startDrawing);
         canvas.addEventListener('touchmove', draw);
-        window.addEventListener('touchend', stopDrawing);
+        window.addEventListener('touchend', () => isDrawing = false);
+        document.getElementById('clearBtn').onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        document.getElementById('clearBtn').onclick = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        };
-
-        // --- SUBMISSION LOGIC ---
+        // --- SUBMISSION ---
         document.getElementById('attendanceForm').onsubmit = async (e) => {
             e.preventDefault();
-            if (!currentUser) return alert("Sila tunggu sehingga sistem disambungkan.");
-
+            if (!currentUser) return alert("Sila tunggu sambungan sistem.");
+            
             const blank = document.createElement('canvas');
-            blank.width = canvas.width;
-            blank.height = canvas.height;
-            if (canvas.toDataURL() === blank.toDataURL()) {
-                return alert("Sila berikan tandatangan anda.");
-            }
+            blank.width = canvas.width; blank.height = canvas.height;
+            if (canvas.toDataURL() === blank.toDataURL()) return alert("Sila tandatangan.");
 
-            loading.classList.remove('hidden');
-
+            document.getElementById('loading').classList.remove('hidden');
             try {
                 const data = {
                     name: document.getElementById('name').value,
@@ -333,35 +304,28 @@
                     createdAt: serverTimestamp(),
                     userId: currentUser.uid
                 };
-
-                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
-                await addDoc(colRef, data);
-
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), data);
                 document.getElementById('registrationForm').classList.add('hidden');
                 document.getElementById('successMsg').classList.remove('hidden');
-            } catch (error) {
-                console.error("Save Error:", error);
-                alert("Gagal menyimpan data ke awan. Sila cuba lagi.");
-            } finally {
-                loading.classList.add('hidden');
-            }
+            } catch (err) { alert("Gagal hantar data."); }
+            document.getElementById('loading').classList.add('hidden');
         };
 
-        // --- ADMIN DASHBOARD ---
-        window.toggleAdminLogin = () => {
+        // --- ADMIN CONTROLS (USING EVENT LISTENERS) ---
+        const toggleModal = () => {
             const modal = document.getElementById('adminLoginModal');
             modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                document.getElementById('adminUser').focus();
-            }
+            if (!modal.classList.contains('hidden')) document.getElementById('adminUser').focus();
         };
 
-        window.loginAdmin = () => {
+        document.getElementById('adminLoginLink').addEventListener('click', toggleModal);
+        document.getElementById('cancelLoginBtn').addEventListener('click', toggleModal);
+
+        document.getElementById('doLoginBtn').addEventListener('click', () => {
             const user = document.getElementById('adminUser').value;
             const pass = document.getElementById('adminPass').value;
-
             if (user === 'Admin' && pass === 'Admin123') {
-                document.getElementById('adminLoginModal').classList.add('hidden');
+                toggleModal();
                 document.getElementById('registrationForm').classList.add('hidden');
                 document.getElementById('successMsg').classList.add('hidden');
                 document.getElementById('adminDashboard').classList.remove('hidden');
@@ -369,84 +333,58 @@
             } else {
                 document.getElementById('loginError').classList.remove('hidden');
             }
-        };
+        });
 
-        window.logoutAdmin = () => {
+        document.getElementById('doLogoutBtn').addEventListener('click', () => {
             if (unsubscribe) unsubscribe();
             document.getElementById('adminDashboard').classList.add('hidden');
             document.getElementById('registrationForm').classList.remove('hidden');
             document.getElementById('adminUser').value = '';
             document.getElementById('adminPass').value = '';
-        };
+        });
 
         function startDataListener() {
-            if (!currentUser) return;
-            loading.classList.remove('hidden');
-
+            document.getElementById('loading').classList.remove('hidden');
             const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
-            
-            unsubscribe = onSnapshot(colRef, (snapshot) => {
-                attendanceData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                attendanceData.sort((a, b) => {
-                    const timeA = a.createdAt?.seconds || 0;
-                    const timeB = b.createdAt?.seconds || 0;
-                    return timeB - timeA;
-                });
-
+            unsubscribe = onSnapshot(colRef, (snap) => {
+                attendanceData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                attendanceData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
                 renderTable();
-                document.getElementById('lastUpdated').textContent = `Dikemas kini pada: ${new Date().toLocaleTimeString()}`;
-                loading.classList.add('hidden');
-            }, (error) => {
-                console.error("Listener Error:", error);
-                loading.classList.add('hidden');
+                document.getElementById('lastUpdated').textContent = `Kemas kini: ${new Date().toLocaleTimeString()}`;
+                document.getElementById('loading').classList.add('hidden');
             });
         }
 
         function renderTable() {
             const tbody = document.getElementById('attendanceTableBody');
-            const noData = document.getElementById('noData');
             tbody.innerHTML = '';
-
             if (attendanceData.length === 0) {
-                noData.classList.remove('hidden');
+                document.getElementById('noData').classList.remove('hidden');
                 return;
             }
-
-            noData.classList.add('hidden');
-            attendanceData.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.className = "hover:bg-gray-50 text-sm";
-                row.innerHTML = `
-                    <td class="p-3 border-b text-gray-500">${index + 1}</td>
+            document.getElementById('noData').classList.add('hidden');
+            attendanceData.forEach((item, i) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 text-sm";
+                tr.innerHTML = `
+                    <td class="p-3 border-b text-gray-500">${i+1}</td>
                     <td class="p-3 border-b font-medium">${item.name}</td>
                     <td class="p-3 border-b">${item.position}</td>
-                    <td class="p-3 border-b">
-                        <div class="text-xs text-gray-600">${item.phone}</div>
-                        <div class="text-xs text-blue-600 font-medium">${item.email}</div>
-                    </td>
-                    <td class="p-3 border-b">
-                        <img src="${item.signature}" class="h-10 border bg-white" alt="Sign">
-                    </td>
+                    <td class="p-3 border-b text-xs">${item.phone}<br><span class="text-blue-600">${item.email}</span></td>
+                    <td class="p-3 border-b"><img src="${item.signature}" class="h-10 border bg-white"></td>
                     <td class="p-3 border-b no-print">
-                        <button onclick="window.deleteEntry('${item.id}')" class="text-red-500 hover:text-red-700 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
+                        <button onclick="window.deleteEntry('${item.id}')" class="text-red-500">
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
                         </button>
                     </td>
                 `;
-                tbody.appendChild(row);
+                tbody.appendChild(tr);
             });
         }
 
         window.deleteEntry = async (id) => {
-            if (!confirm('Padam rekod ini daripada storan awan?')) return;
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'attendance', id);
-                await deleteDoc(docRef);
-            } catch (error) {
-                alert("Ralat memadam data: " + error.message);
+            if (confirm('Padam rekod ini?')) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'attendance', id));
             }
         };
 
