@@ -11,19 +11,15 @@
     <!-- Chosen Palette: Corporate Trust (Slate, White, and Royal Blue) -->
     
     <!-- Application Structure Plan: 
-         Reka bentuk SPA ini menggunakan pendekatan "Dashboard First". 
-         1. Paparan Utama (Dashboard): Menyajikan maklumat kritikal mesyuarat (Tarikh, Masa, Tempat) dan status kehadiran semasa secara visual.
-         2. Modal Pendaftaran: Borang terapung (overlay) digunakan untuk pendaftaran supaya pengguna tidak kehilangan konteks latar belakang.
-         3. Panel Admin Terlindung: Bahagian admin disembunyikan dan hanya muncul selepas log masuk yang sah. Ia mengandungi visualisasi data (Carta) dan jadual pengurusan.
-         Reka bentuk ini dipilih untuk memaksimumkan kebolehgunaan; ahli biasa melihat maklumat ringkas manakala admin mendapat analisis mendalam dalam satu halaman.
+         SPA ini direka untuk kegunaan dwi-fungsi: Pendaftaran awam dan pengurusan admin.
+         Bahagian cetakan kini mempunyai lapisan (layer) khas yang hanya dipaparkan semasa proses 'Print'.
+         Struktur maklumat disusun mengikut piawaian laporan rasmi koperasi.
     -->
-    
+
     <!-- Visualization & Content Choices: 
-         1. Info Grid: Maklumat teks dari laporan dipecahkan kepada kad ikonik (Goal: Inform).
-         2. Bar Chart (Chart.js): Digunakan di Admin Panel untuk membandingkan jumlah kehadiran mengikut Jawatan (Goal: Compare).
-         3. Live Counter: Penunjuk nombor besar dengan bar kemajuan masa nyata (Goal: Inform/Engage).
-         4. Tandatangan Digital: Canvas HTML5 untuk input tandatangan intuitif (Goal: Input).
-         Justifikasi: Penggunaan Chart.js memastikan visualisasi data yang bersih dan responsif tanpa menggunakan SVG luaran.
+         - Bar Chart: Perbandingan komposisi jawatan.
+         - Table: Rekod terperinci dengan sokongan cetakan.
+         - Print Header: Mengandungi logo dan tajuk mesyuarat rasmi.
     -->
 
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
@@ -58,12 +54,27 @@
             cursor: crosshair;
         }
 
+        .print-header { display: none; }
+
         /* Utility for print layout */
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; }
-            body { background: white; }
-            .glass-card { box-shadow: none; border: 1px solid #ddd; }
+            .print-header { 
+                display: block !important; 
+                text-align: center; 
+                margin-bottom: 2rem;
+                border-bottom: 2px solid #334155;
+                padding-bottom: 1rem;
+            }
+            body { background: white; padding: 0; }
+            .glass-card { box-shadow: none; border: none; width: 100%; }
+            main { margin-top: 0 !important; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #cbd5e1 !important; padding: 8px !important; }
+            th { background-color: #f1f5f9 !important; }
+            img { max-height: 60px !important; }
+            @page { margin: 1.5cm; }
         }
         
         /* Table scrollbar */
@@ -74,15 +85,23 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- HERO SECTION / HEADER -->
+    <!-- HEADER KHAS UNTUK CETAKAN (Hanya muncul bila print) -->
+    <div class="print-header">
+        <img src="https://i.postimg.cc/yNSrvgJJ/Logo-Koperasi-Adham-Al-Husainy-Berhad.png" alt="Logo Koperasi" class="mx-auto h-20 mb-4">
+        <h1 class="text-xl font-bold uppercase">Mesyuarat Anggota Lembaga</h1>
+        <h2 class="text-lg font-semibold">Koperasi Adham Al-Husainy Berhad Bil.01/2025</h2>
+        <div class="text-sm mt-2">Senarai Kehadiran Rasmi</div>
+    </div>
+
+    <!-- HERO SECTION / HEADER SKRIN -->
     <div class="bg-slate-900 text-white pb-24 pt-12 px-4 no-print relative overflow-hidden">
         <div class="absolute top-0 right-0 opacity-10 text-[200px] font-bold leading-none select-none pointer-events-none">2025</div>
         <div class="max-w-5xl mx-auto text-center relative z-10">
-            <div class="inline-block p-4 bg-white rounded-2xl shadow-xl mb-6 logo-blend">
+            <div class="inline-block p-4 bg-white rounded-2xl shadow-xl mb-6">
                 <img src="https://i.postimg.cc/yNSrvgJJ/Logo-Koperasi-Adham-Al-Husainy-Berhad.png" 
                      alt="Logo Koperasi" class="h-20 md:h-24 object-contain">
             </div>
-            <h1 class="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight">MESYUARAT ANGGOTA LEMBAGA</h1>
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight uppercase">Mesyuarat Anggota Lembaga</h1>
             <p class="text-blue-200 text-lg md:text-xl font-medium uppercase tracking-wide">Koperasi Adham Al-Husainy Berhad Bil.01/2025</p>
         </div>
     </div>
@@ -91,7 +110,7 @@
     <main class="flex-grow px-4 -mt-16 pb-12 w-full max-w-5xl mx-auto z-20 relative">
         
         <!-- DASHBOARD VIEW -->
-        <div id="dashboardView" class="grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300">
+        <div id="dashboardView" class="grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300 no-print">
             
             <!-- LEFT COLUMN: Butiran Mesyuarat -->
             <div class="lg:col-span-2 space-y-6">
@@ -100,36 +119,36 @@
                         <h2 class="text-xl font-bold text-slate-800">📋 Butiran Mesyuarat</h2>
                         <span id="systemStatus" class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full uppercase">Menyambung...</span>
                     </div>
-                    <p class="text-slate-600 mb-6">
-                        Selamat datang ke portal kehadiran digital rasmi. Laman ini memaparkan maklumat terkini mesyuarat dan membolehkan Anggota Lembaga (ALK) merekodkan kehadiran secara masa nyata untuk tujuan dokumentasi rasmi.
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        Sila semak maklumat mesyuarat di bawah. Semua Anggota Lembaga (ALK) dikehendaki merekodkan kehadiran melalui sistem ini sebagai pengesahan rasmi.
                     </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 hover:bg-blue-50 transition-colors">
+                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
                             <div class="text-2xl mb-2">📅</div>
                             <div class="text-xs font-bold text-blue-600 uppercase tracking-wider">Tarikh</div>
-                            <div class="font-bold text-slate-800 text-lg">30 DISEMBER</div>
-                            <div class="text-sm text-slate-500">2025 (SELASA)</div>
+                            <div class="font-bold text-slate-800 text-lg">30 DIS 2025</div>
+                            <div class="text-xs text-slate-500 uppercase">Selasa</div>
                         </div>
-                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 hover:bg-blue-50 transition-colors">
+                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
                             <div class="text-2xl mb-2">⏰</div>
                             <div class="text-xs font-bold text-blue-600 uppercase tracking-wider">Masa</div>
                             <div class="font-bold text-slate-800 text-lg">08:30 MALAM</div>
-                            <div class="text-sm text-slate-500">Waktu Malaysia</div>
+                            <div class="text-xs text-slate-500 uppercase">Waktu Tempatan</div>
                         </div>
-                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 hover:bg-blue-50 transition-colors">
+                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
                             <div class="text-2xl mb-2">📍</div>
                             <div class="text-xs font-bold text-blue-600 uppercase tracking-wider">Tempat</div>
-                            <div class="font-bold text-slate-800 text-sm leading-tight mb-1">657 JALAN STESEN,<br>SUNGAI BAKAP</div>
-                            <div class="text-xs text-slate-500">14200 SUNGAI JAWI</div>
+                            <div class="font-bold text-slate-800 text-xs leading-tight mb-1 uppercase">657 JALAN STESEN,<br>SUNGAI BAKAP</div>
+                            <div class="text-[10px] text-slate-500 uppercase">14200 Sungai Jawi</div>
                         </div>
                     </div>
                 </div>
 
-                <button onclick="openModal('regModal')" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1 flex items-center justify-between group no-print">
+                <button onclick="openModal('regModal')" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1 flex items-center justify-between group">
                     <div class="text-left">
-                        <div class="text-lg">✍ REKOD KEHADIRAN</div>
-                        <div class="text-blue-200 text-xs font-normal">Klik di sini untuk mendaftar masuk</div>
+                        <div class="text-lg uppercase">✍ Rekod Kehadiran</div>
+                        <div class="text-blue-200 text-xs font-normal">Klik di sini untuk mendaftar kehadiran</div>
                     </div>
                     <div class="text-2xl bg-white/20 w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-white/30">➜</div>
                 </button>
@@ -138,7 +157,7 @@
             <!-- RIGHT COLUMN: Statistik Langsung -->
             <aside class="glass-card rounded-2xl p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Status Kehadiran Semasa</h3>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Status Kehadiran</h3>
                 
                 <div class="relative mb-4">
                     <span class="text-7xl font-black text-slate-800 tracking-tighter" id="liveCount">0</span>
@@ -148,93 +167,95 @@
                     </span>
                 </div>
                 
-                <p class="text-sm text-slate-500 mb-6">Anggota telah mendaftar masuk.</p>
+                <p class="text-sm text-slate-500 mb-6">Anggota telah berdaftar</p>
                 
                 <div class="w-full bg-slate-100 rounded-full h-2 mb-2 overflow-hidden">
                     <div id="liveProgress" class="bg-blue-600 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
                 <div class="flex justify-between w-full text-[10px] text-slate-400 font-bold uppercase">
                     <span>Mula</span>
-                    <span>Sasaran</span>
+                    <span>Sasaran Kuorum</span>
                 </div>
             </aside>
         </div>
 
         <!-- ADMIN PANEL VIEW -->
         <div id="adminPanel" class="hidden space-y-6 mt-6 transition-all duration-300">
-            <div class="bg-slate-800 text-white p-6 rounded-2xl shadow-lg flex flex-wrap justify-between items-center gap-4">
+            <div class="glass-card p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4 bg-slate-800 text-white no-print">
                 <div>
-                    <h2 class="text-xl font-bold">🔒 Panel Admin</h2>
-                    <p class="text-slate-400 text-sm">Pengurusan data kehadiran dan analisis.</p>
+                    <h2 class="text-xl font-bold">🔒 Panel Pengurusan Admin</h2>
+                    <p class="text-slate-400 text-sm italic">Senarai kehadiran masa nyata (real-time).</p>
                 </div>
-                <div class="flex gap-3 no-print">
-                    <button onclick="window.print()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors">🖨 Cetak</button>
-                    <button onclick="logout()" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors">Log Keluar</button>
+                <div class="flex gap-3">
+                    <button onclick="window.print()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-bold transition-colors">🖨 Cetak Senarai</button>
+                    <button onclick="logout()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold transition-colors">Keluar</button>
                 </div>
             </div>
 
-            <!-- Visualisasi Analisis -->
+            <!-- Analisis Visual -->
             <section class="glass-card p-6 rounded-2xl no-print">
-                <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">Analisis Mengikut Jawatan</h3>
-                <p class="text-sm text-slate-500 mb-6">Carta ini memaparkan taburan kehadiran berdasarkan jawatan yang didaftarkan secara dinamik.</p>
+                <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">Analisis Kehadiran Mengikut Jawatan</h3>
                 <div class="chart-container">
                     <canvas id="positionChart"></canvas>
                 </div>
             </section>
 
-            <!-- Jadual Data Penuh -->
-            <section class="glass-card p-6 rounded-2xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-slate-700">Senarai Kehadiran Penuh</h3>
-                    <span id="lastUpdated" class="text-xs text-slate-400 italic">Dikemas kini: -</span>
+            <!-- Jadual Data Rasmi -->
+            <section class="glass-card p-6 rounded-2xl shadow-none">
+                <div class="flex justify-between items-center mb-6 no-print">
+                    <h3 class="font-bold text-slate-700 text-lg">Senarai Kehadiran Penuh</h3>
+                    <span id="lastUpdated" class="text-xs text-slate-400 italic font-mono uppercase">Dikemas kini: -</span>
                 </div>
                 
                 <div class="overflow-x-auto table-scroll">
-                    <table class="w-full text-left border-collapse min-w-[700px]">
+                    <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="text-xs font-bold text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
-                                <th class="py-3 px-4">#</th>
-                                <th class="py-3 px-4">Nama</th>
+                                <th class="py-3 px-4 text-center" style="width: 50px;">Bil</th>
+                                <th class="py-3 px-4">Nama Penuh</th>
                                 <th class="py-3 px-4">Jawatan</th>
-                                <th class="py-3 px-4">Hubungan</th>
+                                <th class="py-3 px-4">Hubungan (Tel/Email)</th>
                                 <th class="py-3 px-4 text-center">T/Tangan</th>
-                                <th class="py-3 px-4 text-right no-print">Tindakan</th>
+                                <th class="py-3 px-4 text-right no-print">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="dataTableBody" class="text-sm text-slate-700"></tbody>
                     </table>
                 </div>
-                <div id="noDataMsg" class="hidden text-center py-8 text-slate-400">Tiada rekod dijumpai dalam pangkalan data.</div>
+                <div id="noDataMsg" class="hidden text-center py-12 text-slate-400">
+                    <div class="text-4xl mb-2">📁</div>
+                    <p>Tiada rekod kehadiran ditemui.</p>
+                </div>
             </section>
         </div>
     </main>
 
     <!-- FOOTER -->
     <footer class="bg-white border-t border-slate-200 py-8 mt-auto text-center no-print">
-        <p class="text-slate-400 text-xs mb-2">&copy; 2025 Koperasi Adham Al-Husainy Berhad. Hak Cipta Terpelihara.</p>
+        <p class="text-slate-400 text-xs mb-2 uppercase tracking-wide">&copy; 2025 Koperasi Adham Al-Husainy Berhad. Hak Cipta Terpelihara.</p>
         <button onclick="openModal('loginModal')" class="text-[10px] font-bold text-slate-300 hover:text-slate-500 uppercase tracking-widest transition-colors">
-            Akses Admin
+            Akses Pentadbir
         </button>
     </footer>
 
     <!-- MODAL: BORANG PENDAFTARAN -->
-    <div id="regModal" class="fixed inset-0 z-50 hidden">
+    <div id="regModal" class="fixed inset-0 z-50 hidden no-print">
         <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity" onclick="closeModal('regModal')"></div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto flex flex-col">
                 <div class="p-5 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
-                    <h3 class="font-bold text-lg text-slate-800">Borang Kehadiran</h3>
+                    <h3 class="font-bold text-lg text-slate-800 uppercase">Borang Kehadiran Digital</h3>
                     <button onclick="closeModal('regModal')" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
                 </div>
                 
                 <form id="attendForm" class="p-6 space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Penuh</label>
-                        <input type="text" id="inpName" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all" placeholder="Masukkan nama penuh">
+                        <input type="text" id="inpName" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Contoh: Ahmad bin Abu">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jawatan</label>
-                        <select id="inpPos" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all">
+                        <select id="inpPos" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
                             <option value="" disabled selected>Pilih Jawatan</option>
                             <option value="Pengerusi">Pengerusi</option>
                             <option value="Setiausaha">Setiausaha</option>
@@ -244,28 +265,29 @@
                             <option value="Lain-lain">Lain-lain</option>
                         </select>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Telefon</label>
-                            <input type="tel" id="inpPhone" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="01x-xxxxxxx">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">No. Telefon</label>
+                            <input type="tel" id="inpPhone" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="01x-xxxxxxx">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Emel</label>
-                            <input type="email" id="inpEmail" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="nama@mail.com">
+                            <input type="email" id="inpEmail" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="nama@email.com">
                         </div>
                     </div>
                     
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-xs font-bold text-slate-500 uppercase">Tandatangan</label>
-                            <button type="button" id="clearSig" class="text-xs text-red-500 hover:text-red-700 underline">Padam</button>
+                            <button type="button" id="clearSig" class="text-xs text-red-500 font-bold hover:underline">Padam</button>
                         </div>
-                        <div class="border-2 border-dashed border-slate-300 rounded-xl h-32 w-full overflow-hidden relative signature-box">
+                        <div class="border-2 border-dashed border-slate-300 rounded-xl h-40 w-full relative signature-box">
                             <canvas id="sigCanvas" class="w-full h-full"></canvas>
                         </div>
+                        <p class="text-[10px] text-slate-400 mt-1 italic">*Tandatangan diperlukan untuk pengesahan korum.</p>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg mt-4 flex justify-center items-center gap-2 transition-all active:scale-95">
+                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg mt-4 flex justify-center items-center gap-2 transition-all active:scale-95">
                         <span>Hantar Kehadiran</span>
                         <div id="spinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     </button>
@@ -275,21 +297,21 @@
     </div>
 
     <!-- MODAL: LOG MASUK ADMIN -->
-    <div id="loginModal" class="fixed inset-0 z-50 hidden">
+    <div id="loginModal" class="fixed inset-0 z-50 hidden no-print">
         <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" onclick="closeModal('loginModal')"></div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8 text-center">
                 <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🔐</div>
-                <h3 class="font-bold text-xl text-slate-800 mb-2">Akses Admin</h3>
-                <p class="text-sm text-slate-500 mb-6">Sila masukkan maklumat log masuk anda.</p>
+                <h3 class="font-bold text-xl text-slate-800 mb-2">Akses Pentadbir</h3>
+                <p class="text-sm text-slate-500 mb-6">Sila masukkan kelayakan untuk menguruskan data.</p>
                 <div class="space-y-3">
-                    <input type="text" id="admUser" placeholder="Username" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                    <input type="password" id="admPass" placeholder="Password" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                    <p id="loginErr" class="hidden text-xs text-red-500 font-bold">Maklumat tidak sah.</p>
+                    <input type="text" id="admUser" placeholder="Username" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <input type="password" id="admPass" placeholder="Password" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <p id="loginErr" class="hidden text-xs text-red-500 font-bold">Username atau Password salah.</p>
                 </div>
-                <div class="mt-6 flex gap-3">
-                    <button onclick="attemptLogin()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Masuk</button>
-                    <button onclick="closeModal('loginModal')" class="flex-1 bg-slate-100 text-slate-600 py-2 rounded-lg font-bold hover:bg-slate-200">Batal</button>
+                <div class="mt-8 flex gap-3">
+                    <button onclick="attemptLogin()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">Masuk</button>
+                    <button onclick="closeModal('loginModal')" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-lg font-bold hover:bg-slate-200">Batal</button>
                 </div>
             </div>
         </div>
@@ -321,23 +343,18 @@
         let chartInstance = null;
         let dataUnsubscribe = null;
 
-        // AUTH INITIALIZATION DENGAN PENGENDALIAN RALAT TOKEN
+        // AUTH INITIALIZATION
         const initAuth = async () => {
             const statusEl = document.getElementById('systemStatus');
             try {
                 const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                 if (token) {
-                    try {
-                        await signInWithCustomToken(auth, token);
-                    } catch (tokenErr) {
-                        // Jika token mismatch atau tidak sah, fallback ke anonymous
-                        await signInAnonymously(auth);
-                    }
+                    try { await signInWithCustomToken(auth, token); } 
+                    catch (e) { await signInAnonymously(auth); }
                 } else {
                     await signInAnonymously(auth);
                 }
             } catch (err) {
-                console.error("Auth Error", err);
                 statusEl.textContent = "OFFLINE";
                 statusEl.className = "px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase";
             }
@@ -359,6 +376,7 @@
             
             dataUnsubscribe = onSnapshot(colRef, (snapshot) => {
                 attendanceData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                // Urut ikut masa turun
                 attendanceData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
                 updateDashboard();
@@ -366,17 +384,18 @@
                     renderAdminTable();
                     updateChart();
                 }
-            }, (err) => console.error("Data Listener Error:", err));
+            });
         }
 
         function updateDashboard() {
             const count = attendanceData.length;
             document.getElementById('liveCount').textContent = count;
+            // Anggaran sasaran kuorum 30 orang
             const pct = Math.min((count / 30) * 100, 100);
             document.getElementById('liveProgress').style.width = `${pct}%`;
         }
 
-        // CANVAS LOGIC
+        // CANVAS SIGNATURE LOGIC
         const canvas = document.getElementById('sigCanvas');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
@@ -409,29 +428,26 @@
             canvas.addEventListener(evt, (e) => {
                 if(!isDrawing) return;
                 const pos = getPos(e);
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2.5;
                 ctx.lineCap = 'round';
-                ctx.strokeStyle = '#000';
+                ctx.strokeStyle = '#0f172a';
                 ctx.lineTo(pos.x, pos.y);
                 ctx.stroke();
                 if(e.type === 'touchmove') e.preventDefault();
             }, {passive: false})
         );
 
-        ['mouseup', 'touchend'].forEach(evt => 
-            window.addEventListener(evt, () => isDrawing = false)
-        );
-
+        ['mouseup', 'touchend'].forEach(evt => window.addEventListener(evt, () => isDrawing = false));
         document.getElementById('clearSig').onclick = () => ctx.clearRect(0,0, canvas.width, canvas.height);
 
-        // FORM HANDLER
+        // FORM SUBMISSION
         document.getElementById('attendForm').onsubmit = async (e) => {
             e.preventDefault();
-            if(!currentUser) return alert("Sila tunggu sambungan sistem.");
+            if(!currentUser) return alert("Sila tunggu sambungan sistem aktif.");
 
             const blank = document.createElement('canvas');
             blank.width = canvas.width; blank.height = canvas.height;
-            if(canvas.toDataURL() === blank.toDataURL()) return alert("Sila turunkan tandatangan.");
+            if(canvas.toDataURL() === blank.toDataURL()) return alert("Sila turunkan tandatangan untuk pengesahan.");
 
             const btn = document.getElementById('submitBtn');
             const spin = document.getElementById('spinner');
@@ -454,17 +470,16 @@
                 closeModal('regModal');
                 e.target.reset();
                 ctx.clearRect(0,0, canvas.width, canvas.height);
-                alert("Kehadiran berjaya direkodkan!");
+                alert("Pendaftaran kehadiran berjaya dihantar.");
             } catch (err) {
-                console.error(err);
-                alert("Gagal menyimpan data.");
+                alert("Ralat menghantar data. Sila cuba lagi.");
             } finally {
                 btn.disabled = false;
                 spin.classList.add('hidden');
             }
         };
 
-        // ANALYTICS CHART
+        // ADMIN ANALYTICS CHART
         function updateChart() {
             const ctxChart = document.getElementById('positionChart').getContext('2d');
             const counts = {};
@@ -485,12 +500,12 @@
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Bilangan',
+                            label: 'Jumlah Anggota',
                             data: vals,
-                            backgroundColor: 'rgba(37, 99, 235, 0.6)',
+                            backgroundColor: 'rgba(37, 99, 235, 0.7)',
                             borderColor: 'rgba(37, 99, 235, 1)',
                             borderWidth: 1,
-                            borderRadius: 6
+                            borderRadius: 8
                         }]
                     },
                     options: {
@@ -503,7 +518,7 @@
             }
         }
 
-        // ADMIN UI
+        // ADMIN DATA TABLE
         function renderAdminTable() {
             const tbody = document.getElementById('dataTableBody');
             tbody.innerHTML = '';
@@ -518,34 +533,34 @@
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
                 tr.innerHTML = `
-                    <td class="py-3 px-4 text-slate-400 font-mono text-xs">${i+1}</td>
-                    <td class="py-3 px-4 font-semibold text-slate-700">${item.name}</td>
-                    <td class="py-3 px-4"><span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold">${item.position}</span></td>
-                    <td class="py-3 px-4 text-xs text-slate-500">
-                        <div>${item.phone}</div>
-                        <div class="text-blue-500">${item.email}</div>
+                    <td class="py-3 px-4 text-center font-mono text-xs text-slate-400">${attendanceData.length - i}</td>
+                    <td class="py-3 px-4 font-bold text-slate-700">${item.name}</td>
+                    <td class="py-3 px-4"><span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-tighter">${item.position}</span></td>
+                    <td class="py-3 px-4 text-xs">
+                        <div class="font-medium">${item.phone}</div>
+                        <div class="text-slate-400 font-light">${item.email}</div>
                     </td>
                     <td class="py-3 px-4 text-center">
-                        <img src="${item.signature}" class="h-8 mx-auto border bg-white rounded cursor-pointer hover:scale-150 transition-transform">
+                        <img src="${item.signature}" class="h-10 mx-auto border border-slate-200 bg-white rounded shadow-sm">
                     </td>
                     <td class="py-3 px-4 text-right no-print">
-                        <button onclick="window.delEntry('${item.id}')" class="text-slate-300 hover:text-red-500 transition-colors">🗑</button>
+                        <button onclick="window.delEntry('${item.id}')" class="text-slate-300 hover:text-red-500 transition-colors" title="Padam">🗑</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
-            document.getElementById('lastUpdated').textContent = `Kemas kini: ${new Date().toLocaleTimeString()}`;
+            document.getElementById('lastUpdated').textContent = `Masa Kemaskini: ${new Date().toLocaleTimeString()}`;
         }
 
         window.delEntry = async (id) => {
-            if(confirm("Adakah anda pasti mahu memadam rekod ini?")) {
+            if(confirm("Padam rekod kehadiran ini?")) {
                 await deleteDoc(doc(db, 'artifacts', APP_ID_PATH, 'public', 'data', 'attendance', id));
             }
         };
 
         window.openModal = (id) => {
             document.getElementById(id).classList.remove('hidden');
-            if(id === 'regModal') setTimeout(resizeCanvas, 200);
+            if(id === 'regModal') setTimeout(resizeCanvas, 300);
         };
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
 
