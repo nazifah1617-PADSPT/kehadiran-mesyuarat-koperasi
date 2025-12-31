@@ -83,6 +83,12 @@
             border-color: #3b82f6;
             background-color: #eff6ff;
         }
+
+        /* Styling for minutes content */
+        .minit-content h1, .minit-content h2 { font-weight: 800; text-transform: uppercase; margin-bottom: 1rem; color: #1e293b; }
+        .minit-content h2 { font-size: 1.125rem; border-left: 4px solid #3b82f6; padding-left: 0.75rem; margin-top: 2rem; }
+        .minit-content p { margin-bottom: 0.75rem; line-height: 1.6; font-size: 0.875rem; text-align: justify; }
+        .minit-content ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 1rem; font-size: 0.875rem; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -153,11 +159,11 @@
                     </div>
                 </div>
 
-                <!-- BUTTON AREA -->
-                <div class="space-y-3">
-                    <button onclick="openModal('regModal')" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1 flex items-center justify-between group">
+                <!-- KAWASAN BUTANG -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button onclick="openModal('regModal')" class="md:col-span-2 w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1 flex items-center justify-between group">
                         <div class="text-left">
-                            <div class="text-lg uppercase">✍ Rekod Kehadiran</div>
+                            <div class="text-lg uppercase font-extrabold">✍ Rekod Kehadiran</div>
                             <div class="text-blue-200 text-xs font-normal">Klik di sini untuk mendaftar masuk (01 Jan 2026)</div>
                         </div>
                         <div class="text-2xl bg-white/20 w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-white/30">➜</div>
@@ -166,9 +172,17 @@
                     <button onclick="openModal('agendaModal')" class="w-full bg-slate-700 hover:bg-slate-800 active:bg-slate-900 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-between group">
                         <div class="text-left">
                             <div class="text-base uppercase tracking-wide">📅 Agenda Mesyuarat</div>
-                            <div class="text-slate-400 text-xs font-normal">Lihat susunan atur cara mesyuarat</div>
+                            <div class="text-slate-400 text-[10px] font-normal uppercase">Atur cara mesyuarat</div>
                         </div>
                         <div class="text-xl bg-white/10 w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-white/20">📜</div>
+                    </button>
+
+                    <button onclick="openModal('minitModal')" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold py-4 px-6 rounded-2xl shadow-sm border border-blue-200 transition-all transform hover:-translate-y-1 flex items-center justify-between group">
+                        <div class="text-left">
+                            <div class="text-base uppercase tracking-wide">📑 Minit Mesyuarat Lepas</div>
+                            <div class="text-blue-400 text-[10px] font-normal uppercase">Rujukan Minit Tahun 2023</div>
+                        </div>
+                        <div class="text-xl bg-blue-200/50 w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-blue-200">🔍</div>
                     </button>
                 </div>
             </div>
@@ -194,7 +208,7 @@
             </aside>
         </div>
 
-        <!-- ADMIN PANEL VIEW -->
+        <!-- PANEL ADMIN (Sembunyi secara lalai) -->
         <div id="adminPanel" class="hidden space-y-6 mt-6 transition-all duration-300">
             <!-- Admin Header -->
             <div class="glass-card p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4 bg-slate-800 text-white no-print">
@@ -282,7 +296,7 @@
         </button>
     </footer>
 
-    <!-- MODAL: REGISTRATION FORM -->
+    <!-- MODAL: BORANG PENDAFTARAN -->
     <div id="regModal" class="fixed inset-0 z-50 hidden no-print">
         <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity" onclick="closeModal('regModal')"></div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
@@ -357,45 +371,33 @@
                 <div class="p-6">
                     <div class="space-y-6">
                         <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">1</div>
-                            <div>
-                                <h4 class="font-bold text-slate-800">Ucapan Alu-aluan Pengerusi</h4>
-                                <p class="text-xs text-slate-500 mt-1">Pembukaan rasmi Mesyuarat Agung Tahunan 2026.</p>
+                            <div class="flex-shrink-0 w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xs border border-blue-100 shadow-sm leading-none text-center">9:00<br>PAGI</div>
+                            <div class="flex items-center">
+                                <h4 class="font-bold text-slate-800 uppercase tracking-tight">Pendaftaran</h4>
                             </div>
                         </div>
                         <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">2</div>
-                            <div>
-                                <h4 class="font-bold text-slate-800">Mengesahkan Minit MAT Lepas</h4>
-                                <p class="text-xs text-slate-500 mt-1">Membentang dan mengesahkan minit Mesyuarat Agung Tahunan yang lalu.</p>
+                            <div class="flex-shrink-0 w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xs border border-blue-100 shadow-sm leading-none text-center">9:30<br>PAGI</div>
+                            <div class="flex items-center">
+                                <h4 class="font-bold text-slate-800 uppercase tracking-tight">Bacaan Doa</h4>
                             </div>
                         </div>
                         <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">3</div>
-                            <div>
-                                <h4 class="font-bold text-slate-800">Laporan Tahunan Lembaga</h4>
-                                <p class="text-xs text-slate-500 mt-1">Membentangkan aktiviti dan pencapaian koperasi sepanjang tahun 2025.</p>
+                            <div class="flex-shrink-0 w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xs border border-blue-100 shadow-sm leading-none text-center">9:45<br>PAGI</div>
+                            <div class="flex items-center">
+                                <h4 class="font-bold text-slate-800 uppercase tracking-tight">Ucapan Pengerusi</h4>
                             </div>
                         </div>
                         <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">4</div>
-                            <div>
-                                <h4 class="font-bold text-slate-800">Penyata Kewangan Teraudit</h4>
-                                <p class="text-xs text-slate-500 mt-1">Membentang dan meluluskan akaun bagi tahun berakhir 31 Disember 2025.</p>
+                            <div class="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md shadow-blue-200 leading-none text-center">10:15<br>PAGI</div>
+                            <div class="flex items-center">
+                                <h4 class="font-bold text-slate-900 uppercase tracking-tight">Mesyuarat Agung Tahunan</h4>
                             </div>
                         </div>
                         <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">5</div>
-                            <div>
-                                <h4 class="font-bold text-slate-800">Pemilihan Anggota Lembaga</h4>
-                                <p class="text-xs text-slate-500 mt-1">Pengundian dan pelantikan ALK bagi penggal baharu.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">6</div>
-                            <div>
-                                <h4 class="font-bold text-slate-800">Hal-hal Lain & Penutup</h4>
-                                <p class="text-xs text-slate-500 mt-1">Perbincangan usul dan ucapan penangguhan.</p>
+                            <div class="flex-shrink-0 w-12 h-12 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-bold text-xs border border-slate-200 shadow-sm leading-none text-center">12:30<br>TGHARI</div>
+                            <div class="flex items-center">
+                                <h4 class="font-bold text-slate-700 uppercase tracking-tight italic">Makan tghari / bersurai</h4>
                             </div>
                         </div>
                     </div>
@@ -407,7 +409,105 @@
         </div>
     </div>
 
-    <!-- MODAL: ADMIN LOGIN -->
+    <!-- MODAL: MINIT MESYUARAT LEPAS -->
+    <div id="minitModal" class="fixed inset-0 z-50 hidden no-print">
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity" onclick="closeModal('minitModal')"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden transition-all scale-100">
+                <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-blue-50">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800 uppercase leading-none">Minit Mesyuarat Lepas</h3>
+                        <p class="text-[10px] text-blue-600 font-bold uppercase mt-1 tracking-widest">Sesi Agung Khas 2023</p>
+                    </div>
+                    <button onclick="closeModal('minitModal')" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+                </div>
+                <div class="p-8 overflow-y-auto table-scroll minit-content">
+                    <h1>MINIT MESYUARAT AGUNG KHAS TAHUN 2023 KOPERASI KELUARGA ADHAM AL-HUSAINY BERHAD</h1>
+                    
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 flex flex-wrap gap-4 text-xs font-bold text-slate-600">
+                        <span>📅 TARIKH: 6 April 2024</span>
+                        <span>⏰ MASA: 2.30 Petang</span>
+                        <span>📍 TEMPAT: 657 Jalan Stesen Sungai Bakap</span>
+                    </div>
+
+                    <h2>KEHADIRAN:</h2>
+                    <p>Seramai 23 orang ahli keluarga telah hadir:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 mb-6">
+                        <ol>
+                            <li>Mohamad Zaki Bin Hj Abd Halim (Pengerusi)</li>
+                            <li>Raznah Binti Abdul Halim</li>
+                            <li>Ahmad Syokri Bin Abdul Halim</li>
+                            <li>Mohammad Helmy Bin Omar</li>
+                            <li>Azizah Binti Ghazali</li>
+                            <li>Sakinah Binti Abdul Wahab @ Abd Wahab</li>
+                            <li>Nurul Huda Binti Haji Md Saleh</li>
+                            <li>Muhammad Iqmal Nur Hakim</li>
+                            <li>Iffah Syakirah Binti Ahmad Syokri</li>
+                            <li>Zaharah Bt Mohd Omar</li>
+                            <li>Fathin Sofia Bt Mohamad Zaki</li>
+                            <li>Fathin Nabila Binti Mohamad Zaki</li>
+                        </ol>
+                        <ol start="13">
+                            <li>Fathin Nadia Binti Mohamad Zaki</li>
+                            <li>Mohammad Syamil Bin Omar</li>
+                            <li>Siti Fatimah Bt Amir</li>
+                            <li>Amir Arif Bin Omar</li>
+                            <li>Safira Safura Bt Badrisyah</li>
+                            <li>Rusyda Adiba Binti Omar</li>
+                            <li>Syatirah Adiba Binti Omar</li>
+                            <li>Muhd Irfan Bin Ahmad Syokri</li>
+                            <li>Kamar Shahrom bin Kamaruzaman</li>
+                            <li>Mohd Ridzuan Bin Mohd Saleh</li>
+                            <li>Ahmad Hafizan Abd Halim (Setiausaha)</li>
+                        </ol>
+                    </div>
+
+                    <h2>1.0 UCAPAN PENGERUSI</h2>
+                    <p>1.1 Pengerusi memulakan mesyuarat dengan bacaan Ummul Kitab Al-Fatihah dan mengucapkan selamat datang kepada semua 23 orang ahli keluarga yang hadir ke Mesyuarat Agung Khas ini.</p>
+                    <p>1.2 Pengerusi menyatakan bahawa mesyuarat ini diadakan khusus untuk membincangkan hala tuju penubuhan koperasi keluarga dan pemantapan struktur organisasi sebelum melangkah ke fasa seterusnya pada tahun 2024.</p>
+                    <p>1.3 Beliau menekankan bahawa kehadiran ramai ahli keluarga termasuk generasi muda pada hari ini adalah satu petanda positif bagi kelangsungan warisan keluarga Adham Al-Husainy.</p>
+
+                    <h2>2.0 TUJUAN MESYUARAT AGUNG KHAS</h2>
+                    <p>2.1 Mesyuarat diadakan bertujuan untuk mendapat persetujuan ahli mengenai pindaan beberapa klausa dalam Undang-undang Kecil Koperasi bagi membolehkan aktiviti hartanah dijalankan dengan lebih meluas.</p>
+                    <p>2.2 Mesyuarat juga bertujuan untuk membincangkan cadangan awal pengambilalihan atau pengurusan aset tanah keluarga di Sungai Bakap untuk dijadikan sebagai aset produktif koperasi.</p>
+
+                    <h2>3.0 PEMBENTANGAN DAN PERBINCANGAN</h2>
+                    <p>3.1 Setiausaha membentangkan draf perancangan perniagaan yang merangkumi sektor hartanah, peruncitan dan kebajikan.</p>
+                    <p>3.2 Ahli mesyuarat berbincang mengenai keperluan modal syer dan yuran bulanan yang perlu disumbangkan oleh setiap ahli untuk menggerakkan aktiviti koperasi pada peringkat awal.</p>
+                    <p>3.3 Cadangan agar koperasi memfokuskan kepada penyatuan geran-geran kecil harta pusaka di bawah satu entiti perniagaan supaya lebih mudah diuruskan secara profesional.</p>
+
+                    <h2>4.0 RESOLUSI MESYUARAT</h2>
+                    <p>4.1 Ahli mesyuarat secara sebulat suara bersetuju dengan pelantikan Ahli Lembaga Koperasi (ALK) interim yang akan menguruskan pendaftaran rasmi.</p>
+                    <p>4.2 Mesyuarat bersetuju untuk menetapkan sasaran agar koperasi mula menjana pendapatan melalui sewa tapak dan aktiviti perniagaan kecil-kecilan bermula tahun 2024.</p>
+
+                    <h2>5.0 HAL-HAL LAIN</h2>
+                    <p>5.1 Terdapat cadangan supaya diadakan aktiviti "Hari Keluarga" pada tahun hadapan bagi memperkukuhkan ukhuwah sambil mempromosikan fungsi koperasi kepada ahli yang belum hadir.</p>
+
+                    <h2>6.0 PENUTUP</h2>
+                    <p>6.1 Pengerusi mengucapkan terima kasih atas komitmen semua ahli yang hadir dan berharap agar perancangan ini mendapat keberkatan.</p>
+                    <p>6.2 Mesyuarat ditangguhkan pada jam 5.00 petang.</p>
+
+                    <div class="mt-12 pt-8 border-t border-slate-200 grid grid-cols-2 gap-8 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        <div>
+                            <p class="mb-12 underline">Disediakan oleh:</p>
+                            <p class="text-slate-900">AHMAD HAFIZAN ABD HALIM</p>
+                            <p>Setiausaha / Pencatat Minit</p>
+                        </div>
+                        <div>
+                            <p class="mb-12 underline">Disahkan oleh:</p>
+                            <p class="text-slate-900">MOHAMAD ZAKI BIN HJ ABD HALIM</p>
+                            <p>Pengerusi</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 border-t border-slate-100 text-right">
+                    <button onclick="closeModal('minitModal')" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold text-xs uppercase shadow-md hover:bg-blue-700 transition-colors">Tutup Dokumen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: LOG MASUK ADMIN -->
     <div id="loginModal" class="fixed inset-0 z-50 hidden no-print">
         <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" onclick="closeModal('loginModal')"></div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
@@ -555,7 +655,6 @@
         ['mouseup', 'touchend'].forEach(evt => window.addEventListener(evt, () => isDrawing = false));
         document.getElementById('clearSig').onclick = () => ctx.clearRect(0,0, canvas.width, canvas.height);
 
-        // LOGIK DINAMIK UNTUK JAWATAN
         const inpPos = document.getElementById('inpPos');
         const otherPosContainer = document.getElementById('otherPosContainer');
         const inpOtherPos = document.getElementById('inpOtherPos');
@@ -649,11 +748,11 @@
                 return;
             }
             document.getElementById('noDataMsg').classList.add('hidden');
-            filteredAttendance.forEach((item, i) => {
+            attendanceData.forEach((item, i) => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
                 tr.innerHTML = `
-                    <td class="py-3 px-4 text-center font-mono text-xs text-slate-400">${filteredAttendance.length - i}</td>
+                    <td class="py-3 px-4 text-center font-mono text-xs text-slate-400">${attendanceData.length - i}</td>
                     <td class="py-3 px-4 font-bold text-slate-700">${item.name}</td>
                     <td class="py-3 px-4"><span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-tighter">${item.position}</span></td>
                     <td class="py-3 px-4 text-xs">
@@ -677,7 +776,7 @@
 
         window.openModal = (id) => {
             document.getElementById(id).classList.remove('hidden');
-            if(id === 'regModal') setTimeout(resizeCanvas, 300);
+            if(id === 'regModal' || id === 'minitModal') setTimeout(resizeCanvas, 300);
         };
         window.closeModal = (id) => {
             document.getElementById(id).classList.add('hidden');
