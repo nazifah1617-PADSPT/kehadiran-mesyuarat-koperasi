@@ -10,12 +10,6 @@
     
     <!-- Chosen Palette: Corporate Trust (Slate, White, and Royal Blue) -->
     
-    <!-- Application Structure Plan: 
-         SPA ini direka untuk menguruskan data kehadiran mesyuarat secara spesifik. 
-         Bahagian Admin kini mempunyai arkib yang disembunyikan secara lalai. Admin perlu mengklik folder mesyuarat untuk melihat butiran.
-         Sistem kini dikonfigurasikan untuk menapis data hanya bagi tarikh 01 Jan 2026 bagi pengiraan status live.
-    -->
-
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #334155; }
         
@@ -127,13 +121,13 @@
         <!-- DASHBOARD VIEW -->
         <div id="dashboardView" class="grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300 no-print">
             
-            <div class="lg:col-span-2 space-y-6">
+            <div class="lg:col-span-2 space-y-4">
                 <div class="glass-card rounded-2xl p-6 md:p-8">
                     <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
                         <h2 class="text-xl font-bold text-slate-800">📋 Butiran Mesyuarat</h2>
                         <span id="systemStatus" class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full uppercase">Menyambung...</span>
                     </div>
-                    <p class="text-slate-600 mb-6 leading-relaxed">
+                    <p class="text-slate-600 mb-6 leading-relaxed text-sm">
                         Sila semak maklumat mesyuarat di bawah. Semua ahli dikehendaki merekodkan kehadiran melalui sistem ini sebagai pengesahan rasmi untuk sesi tahun 2026.
                     </p>
 
@@ -159,13 +153,24 @@
                     </div>
                 </div>
 
-                <button onclick="openModal('regModal')" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1 flex items-center justify-between group">
-                    <div class="text-left">
-                        <div class="text-lg uppercase">✍ Rekod Kehadiran</div>
-                        <div class="text-blue-200 text-xs font-normal">Klik di sini untuk mendaftar masuk (01 Jan 2026)</div>
-                    </div>
-                    <div class="text-2xl bg-white/20 w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-white/30">➜</div>
-                </button>
+                <!-- BUTTON AREA -->
+                <div class="space-y-3">
+                    <button onclick="openModal('regModal')" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1 flex items-center justify-between group">
+                        <div class="text-left">
+                            <div class="text-lg uppercase">✍ Rekod Kehadiran</div>
+                            <div class="text-blue-200 text-xs font-normal">Klik di sini untuk mendaftar masuk (01 Jan 2026)</div>
+                        </div>
+                        <div class="text-2xl bg-white/20 w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-white/30">➜</div>
+                    </button>
+
+                    <button onclick="openModal('agendaModal')" class="w-full bg-slate-700 hover:bg-slate-800 active:bg-slate-900 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-between group">
+                        <div class="text-left">
+                            <div class="text-base uppercase tracking-wide">📅 Agenda Mesyuarat</div>
+                            <div class="text-slate-400 text-xs font-normal">Lihat susunan atur cara mesyuarat</div>
+                        </div>
+                        <div class="text-xl bg-white/10 w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-white/20">📜</div>
+                    </button>
+                </div>
             </div>
 
             <aside class="glass-card rounded-2xl p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
@@ -224,11 +229,9 @@
 
             <!-- RUANGAN DATA TERPERINCI -->
             <div id="detailedRecordView" class="hidden space-y-6 animate-fade-in">
-                
                 <button onclick="hideMeetingDetails()" class="no-print flex items-center gap-2 text-blue-600 font-bold text-xs uppercase hover:underline mb-2">
                     ⬅ Kembali ke Arkib
                 </button>
-
                 <section class="glass-card p-6 rounded-2xl no-print">
                     <div class="flex justify-between items-center mb-6 border-b pb-2">
                         <h3 class="font-bold text-slate-700">Analisis Kehadiran Mengikut Jawatan</h3>
@@ -238,7 +241,6 @@
                         <canvas id="positionChart"></canvas>
                     </div>
                 </section>
-
                 <section class="glass-card p-6 rounded-2xl shadow-none">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div class="bg-blue-600 text-white px-5 py-3 rounded-xl inline-block shadow-md">
@@ -248,7 +250,6 @@
                             <button onclick="window.print()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors">🖨 Cetak PDF</button>
                         </div>
                     </div>
-                    
                     <div class="overflow-x-auto table-scroll">
                         <table class="w-full text-left border-collapse">
                             <thead>
@@ -281,7 +282,7 @@
         </button>
     </footer>
 
-    <!-- MODAL: BORANG PENDAFTARAN -->
+    <!-- MODAL: REGISTRATION FORM -->
     <div id="regModal" class="fixed inset-0 z-50 hidden no-print">
         <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity" onclick="closeModal('regModal')"></div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
@@ -310,12 +311,10 @@
                             <option value="Lain-lain">Lain-lain</option>
                         </select>
                     </div>
-                    <!-- INPUT DINAMIK UNTUK LAIN-LAIN -->
                     <div id="otherPosContainer" class="hidden animate-fade-in">
                         <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Nyatakan Jawatan Anda</label>
                         <input type="text" id="inpOtherPos" class="w-full px-4 py-2 bg-blue-50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="cth: Pengurus Besar">
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-sm font-bold text-slate-500 uppercase mb-1">No. Telefon</label>
@@ -344,7 +343,71 @@
         </div>
     </div>
 
-    <!-- MODAL: LOG MASUK ADMIN -->
+    <!-- MODAL: AGENDA MESYUARAT -->
+    <div id="agendaModal" class="fixed inset-0 z-50 hidden no-print">
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity" onclick="closeModal('agendaModal')"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto flex flex-col">
+                <div class="p-5 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+                    <h3 class="font-bold text-lg text-slate-800 uppercase flex items-center gap-2">
+                        <span>📜 Agenda Mesyuarat</span>
+                    </h3>
+                    <button onclick="closeModal('agendaModal')" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">1</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">Ucapan Alu-aluan Pengerusi</h4>
+                                <p class="text-xs text-slate-500 mt-1">Pembukaan rasmi Mesyuarat Agung Tahunan 2026.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">2</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">Mengesahkan Minit MAT Lepas</h4>
+                                <p class="text-xs text-slate-500 mt-1">Membentang dan mengesahkan minit Mesyuarat Agung Tahunan yang lalu.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">3</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">Laporan Tahunan Lembaga</h4>
+                                <p class="text-xs text-slate-500 mt-1">Membentangkan aktiviti dan pencapaian koperasi sepanjang tahun 2025.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">4</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">Penyata Kewangan Teraudit</h4>
+                                <p class="text-xs text-slate-500 mt-1">Membentang dan meluluskan akaun bagi tahun berakhir 31 Disember 2025.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">5</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">Pemilihan Anggota Lembaga</h4>
+                                <p class="text-xs text-slate-500 mt-1">Pengundian dan pelantikan ALK bagi penggal baharu.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">6</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">Hal-hal Lain & Penutup</h4>
+                                <p class="text-xs text-slate-500 mt-1">Perbincangan usul dan ucapan penangguhan.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="closeModal('agendaModal')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl mt-8 transition-colors">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADMIN LOGIN -->
     <div id="loginModal" class="fixed inset-0 z-50 hidden no-print">
         <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" onclick="closeModal('loginModal')"></div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
@@ -521,9 +584,7 @@
             spin.classList.remove('hidden');
 
             try {
-                // Gunakan nilai dari 'Lain-lain' jika ia dipilih
                 const finalPosition = (inpPos.value === "Lain-lain") ? inpOtherPos.value : inpPos.value;
-
                 const payload = {
                     name: document.getElementById('inpName').value,
                     position: finalPosition,
