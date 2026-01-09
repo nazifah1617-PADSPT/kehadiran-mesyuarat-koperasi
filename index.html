@@ -60,17 +60,21 @@
         .table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
         .archive-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            user-select: none;
         }
         .archive-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-2px);
             border-color: #3b82f6;
-            background-color: #eff6ff;
+            background-color: #f0f7ff;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1);
         }
+        .archive-card:active { transform: scale(0.98); }
 
-        .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; }
-        .tab-inactive { border-bottom: 2px solid transparent; color: #94a3b8; }
+        .tab-active { border-bottom: 3px solid #2563eb; color: #1e40af; background: #eff6ff; }
+        .tab-inactive { border-bottom: 3px solid transparent; color: #94a3b8; }
+        .tab-inactive:hover { color: #64748b; background: #f8fafc; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -82,8 +86,8 @@
         <h2 class="text-lg font-semibold">Koperasi Adham Al-Husainy Berhad Tahun <span id="printMeetingYear">2026</span></h2>
         
         <div class="print-details border-t border-b border-slate-300 py-2 mt-4 px-4">
-            <div id="printDate"><strong>TARIKH:</strong> 09 JANUARI 2026</div>
-            <div id="printTime"><strong>MASA:</strong> 20:30 (8:30 MALAM)</div>
+            <div><strong>TARIKH:</strong> <span id="printMeetingDate">09 JANUARI 2026</span></div>
+            <div><strong>MASA:</strong> <span id="printMeetingTime">08:30 MALAM</span></div>
             <div><strong>TEMPAT:</strong> <span id="printMeetingVenue">657 JALAN STESEN, SUNGAI BAKAP, 14200 SUNGAI JAWI</span></div>
         </div>
         
@@ -94,7 +98,7 @@
     <header class="bg-slate-900 text-white pb-24 pt-12 px-4 no-print relative overflow-hidden">
         <div class="absolute top-0 right-0 opacity-10 text-[200px] font-bold leading-none select-none pointer-events-none tracking-tighter dyn-meeting-year">2026</div>
         <div class="max-w-5xl mx-auto text-center relative z-10">
-            <div class="inline-block p-4 bg-white rounded-2xl shadow-xl mb-6 shadow-blue-900/20 transition-transform hover:scale-105">
+            <div class="inline-block p-4 bg-white rounded-2xl shadow-xl mb-6 shadow-blue-900/20">
                 <img src="https://i.postimg.cc/yNSrvgJJ/Logo-Koperasi-Adham-Al-Husainy-Berhad.png" 
                      alt="Logo Koperasi" class="h-20 md:h-24 object-contain">
             </div>
@@ -174,7 +178,7 @@
             <div class="glass-card p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4 bg-slate-800 text-white no-print shadow-xl">
                 <div>
                     <h2 class="text-xl font-bold">🔒 Panel Pengurusan Pentadbir</h2>
-                    <p class="text-slate-400 text-sm italic font-medium">Urus rekod dan tetapan mesyuarat di sini.</p>
+                    <p class="text-slate-400 text-sm italic font-medium">Klik folder atau tab di bawah untuk mula.</p>
                 </div>
                 <div class="flex gap-3">
                     <button onclick="logout()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-bold transition-colors border border-slate-600 shadow-sm active:scale-95">Keluar</button>
@@ -182,44 +186,44 @@
             </div>
 
             <!-- TAB NAVIGATION -->
-            <nav class="flex border-b border-slate-200 no-print">
-                <button onclick="switchAdminTab('archive')" id="tabBtnArchive" class="px-6 py-3 font-bold text-sm uppercase tracking-wider tab-active transition-all">Arkib & Rekod</button>
-                <button onclick="switchAdminTab('settings')" id="tabBtnSettings" class="px-6 py-3 font-bold text-sm uppercase tracking-wider tab-inactive transition-all">Tetapan Mesyuarat</button>
+            <nav class="flex border-b border-slate-200 no-print bg-white rounded-t-xl overflow-hidden">
+                <button onclick="switchAdminTab('archive')" id="tabBtnArchive" class="flex-1 px-6 py-4 font-bold text-xs uppercase tracking-widest tab-active transition-all">📂 Arkib & Rekod</button>
+                <button onclick="switchAdminTab('settings')" id="tabBtnSettings" class="flex-1 px-6 py-4 font-bold text-xs uppercase tracking-widest tab-inactive transition-all">⚙️ Tetapan Mesyuarat</button>
             </nav>
 
             <!-- SECTION: SETTINGS -->
             <div id="adminSettingsSection" class="hidden animate-fade-in no-print">
-                <div class="glass-card p-8 rounded-2xl space-y-6">
+                <div class="glass-card p-8 rounded-b-2xl space-y-6 border-t-0">
                     <div class="border-b pb-4">
-                        <h3 class="font-extrabold text-slate-800 text-lg uppercase tracking-tight">⚙️ Tetapan Mesyuarat Semasa</h3>
-                        <p class="text-xs text-slate-500 mt-1 uppercase tracking-tight font-bold">Nota: Sila pastikan Security Rules di Firebase membenarkan akses ke koleksi 'settings'.</p>
+                        <h3 class="font-extrabold text-slate-800 text-lg uppercase tracking-tight">Konfigurasi Mesyuarat Semasa</h3>
+                        <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest font-bold">Data ini dikongsi kepada semua peranti yang mengakses borang ini.</p>
                     </div>
                     
                     <form id="meetingSettingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Tajuk Mesyuarat</label>
-                            <input type="text" id="setMeetingTitle" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="Cth: Mesyuarat Ahli Lembaga Koperasi">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1">Tajuk Mesyuarat</label>
+                            <input type="text" id="setMeetingTitle" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="Cth: Mesyuarat Ahli Lembaga Koperasi">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Tahun</label>
-                            <input type="number" id="setMeetingYear" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="2026">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1">Tahun Mesyuarat</label>
+                            <input type="number" id="setMeetingYear" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="2026">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Tarikh (YYYY-MM-DD)</label>
-                            <input type="date" id="setMeetingDate" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1">Tarikh Persidangan</label>
+                            <input type="date" id="setMeetingDate" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Masa</label>
-                            <input type="text" id="setMeetingTime" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="08:30 Malam">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1">Masa Bermula</label>
+                            <input type="text" id="setMeetingTime" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="08:30 Malam">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Tempat / Lokasi</label>
-                            <input type="text" id="setMeetingVenue" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="Cth: 657 Jalan Stesen, Sungai Bakap">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1">Tempat / Lokasi</label>
+                            <input type="text" id="setMeetingVenue" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="Cth: 657 Jalan Stesen, Sungai Bakap">
                         </div>
                         
                         <div class="md:col-span-2 pt-4">
-                            <button type="submit" id="saveSettingsBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-8 py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2">
-                                <span>Simpan Perubahan</span>
+                            <button type="submit" id="saveSettingsBtn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-10 py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span>Simpan Tetapan Baharu</span>
                                 <div id="settingsSpinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                             </button>
                         </div>
@@ -229,13 +233,16 @@
 
             <!-- SECTION: ARCHIVE -->
             <div id="meetingArchiveSection" class="space-y-4 no-print">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-2 font-extrabold">Pilih Sesi Rekod</h3>
-                <div class="grid grid-cols-1 gap-4" id="archiveListContainer"></div>
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-2">Senarai Sesi Mesyuarat</h3>
+                <div class="grid grid-cols-1 gap-4" id="archiveListContainer">
+                    <!-- Folder sesi akan dijana secara automatik di sini -->
+                </div>
             </div>
 
+            <!-- DETAILED VIEW -->
             <div id="detailedRecordView" class="hidden space-y-6 animate-fade-in">
-                <button onclick="hideMeetingDetails()" class="no-print flex items-center gap-2 text-blue-600 font-bold text-xs uppercase hover:underline mb-2 px-1">
-                    ⬅ Kembali ke Senarai
+                <button onclick="hideMeetingDetails()" class="no-print flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase hover:underline mb-2 px-1 tracking-widest">
+                    ⬅ Kembali ke Senarai Sesi
                 </button>
                 
                 <section class="glass-card p-6 rounded-2xl shadow-none">
@@ -244,8 +251,8 @@
                             <h3 id="viewHeaderTitle" class="font-extrabold text-lg uppercase tracking-tight">Senarai Ahli</h3>
                         </div>
                         <div class="flex gap-2 no-print">
-                            <button onclick="window.print()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm flex items-center gap-2">
-                                <span>🖨 Cetak PDF</span>
+                            <button onclick="window.print()" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm flex items-center gap-2">
+                                <span>🖨 Cetak Laporan (PDF)</span>
                             </button>
                         </div>
                     </div>
@@ -253,22 +260,22 @@
                     <div class="overflow-x-auto table-scroll">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="text-xs font-bold text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
-                                    <th class="py-3 px-4 text-center" style="width: 50px;">Bil</th>
-                                    <th class="py-3 px-4">Nama Penuh</th>
-                                    <th class="py-3 px-4 text-center">No. Ahli</th>
-                                    <th class="py-3 px-4">Jawatan</th>
-                                    <th class="py-3 px-4">Hubungan (Tel/Email)</th>
-                                    <th class="py-3 px-4 text-center">T/Tangan</th>
-                                    <th class="py-3 px-4 text-right no-print">Aksi</th>
+                                <tr class="text-[10px] font-black text-slate-400 uppercase bg-slate-50 border-y border-slate-200 tracking-widest">
+                                    <th class="py-4 px-4 text-center" style="width: 50px;">Bil</th>
+                                    <th class="py-4 px-4">Nama Penuh</th>
+                                    <th class="py-4 px-4 text-center">No. Ahli</th>
+                                    <th class="py-4 px-4">Jawatan</th>
+                                    <th class="py-4 px-4">Hubungan (Tel/Email)</th>
+                                    <th class="py-4 px-4 text-center">T/Tangan</th>
+                                    <th class="py-4 px-4 text-right no-print">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="dataTableBody" class="text-sm text-slate-700"></tbody>
                         </table>
                     </div>
-                    <div id="noDataMsg" class="hidden text-center py-16 text-slate-400">
-                        <div class="text-5xl mb-4 grayscale opacity-50">📂</div>
-                        <p class="font-medium uppercase tracking-widest text-xs">Tiada rekod ahli ditemui.</p>
+                    <div id="noDataMsg" class="hidden text-center py-20 text-slate-400 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-100">
+                        <div class="text-6xl mb-4 grayscale opacity-20">📂</div>
+                        <p class="font-bold uppercase tracking-widest text-[10px]">Tiada rekod pendaftaran ahli ditemui.</p>
                     </div>
                 </section>
             </div>
@@ -276,8 +283,8 @@
     </main>
 
     <footer class="bg-white border-t border-slate-200 py-8 mt-auto text-center no-print">
-        <p class="text-slate-400 text-xs mb-2 uppercase font-semibold tracking-[0.2em]">&copy; <span class="dyn-meeting-year">2026</span> Koperasi Adham Al-Husainy Berhad. Hak Cipta Terpelihara.</p>
-        <button onclick="openModal('loginModal')" class="text-[10px] font-bold text-slate-300 hover:text-slate-600 uppercase tracking-widest transition-all p-2 rounded hover:bg-slate-50">Akses Sistem Pentadbir</button>
+        <p class="text-slate-400 text-[10px] mb-2 uppercase font-black tracking-[0.3em]">&copy; <span class="dyn-meeting-year">2026</span> Koperasi Adham Berhad</p>
+        <button onclick="openModal('loginModal')" class="text-[10px] font-bold text-slate-300 hover:text-blue-600 uppercase tracking-widest transition-all p-2 rounded hover:bg-blue-50">Sistem Pentadbir</button>
     </footer>
 
     <!-- MODAL PENDAFTARAN -->
@@ -291,15 +298,15 @@
                 </div>
                 <form id="attendForm" class="p-6 space-y-4">
                     <div>
-                        <label class="block text-sm font-bold text-slate-500 uppercase mb-1">Nama Penuh</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Nama Penuh</label>
                         <input type="text" id="inpName" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-inner" placeholder="Masukkan nama penuh anda">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-slate-500 uppercase mb-1">Nombor Ahli Koperasi</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Nombor Ahli Koperasi</label>
                         <input type="text" id="inpMemberNo" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-inner" placeholder="Cth: K1234 atau 055">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-slate-500 uppercase mb-1">Jawatan</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Jawatan</label>
                         <select id="inpPos" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all cursor-pointer shadow-inner">
                             <option value="" disabled selected>Pilih Jawatan</option>
                             <option value="Pengerusi">Pengerusi</option>
@@ -314,17 +321,17 @@
                     </div>
                     <div id="otherPosContainer" class="hidden animate-fade-in">
                         <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Sila Nyatakan Jawatan</label>
-                        <input type="text" id="inpOtherPos" class="w-full px-4 py-2 bg-blue-50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none shadow-inner" placeholder="Contoh: Pengurus">
+                        <input type="text" id="inpOtherPos" class="w-full px-4 py-2 bg-blue-50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Cth: Pengurus">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div><label class="block text-sm font-bold text-slate-500 uppercase mb-1">No. Telefon</label><input type="tel" id="inpPhone" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none shadow-inner" placeholder="01x-xxxxxxx"></div>
-                        <div><label class="block text-sm font-bold text-slate-500 uppercase mb-1">Emel</label><input type="email" id="inpEmail" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none shadow-inner" placeholder="nama@email.com"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">No. Telefon</label><input type="tel" id="inpPhone" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none shadow-inner" placeholder="01x-xxxxxxx"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Emel</label><input type="email" id="inpEmail" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none shadow-inner" placeholder="nama@email.com"></div>
                     </div>
                     <div>
-                        <div class="flex justify-between items-center mb-1"><label class="block text-sm font-bold text-slate-500 uppercase tracking-wider">Tandatangan Rasmi</label><button type="button" id="clearSig" class="text-xs text-red-500 font-bold hover:underline">Padam</button></div>
-                        <div class="border-2 border-dashed border-slate-300 rounded-xl h-40 w-full relative signature-box overflow-hidden"><canvas id="sigCanvas" class="w-full h-full"></canvas></div>
+                        <div class="flex justify-between items-center mb-1"><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Tandatangan Digital</label><button type="button" id="clearSig" class="text-[10px] text-red-500 font-black hover:underline uppercase tracking-tighter">Padam</button></div>
+                        <div class="border-2 border-dashed border-slate-300 rounded-xl h-40 w-full relative signature-box overflow-hidden shadow-inner"><canvas id="sigCanvas" class="w-full h-full"></canvas></div>
                     </div>
-                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg mt-4 flex justify-center items-center gap-2 transition-all active:scale-95 shadow-blue-500/20"><span>Hantar Kehadiran</span><div id="spinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div></button>
+                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg mt-4 flex justify-center items-center gap-2 transition-all active:scale-95 shadow-blue-500/20 uppercase tracking-widest"><span>Hantar Kehadiran</span><div id="spinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div></button>
                 </form>
             </div>
         </div>
@@ -335,7 +342,7 @@
         <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" onclick="closeModal('loginModal')"></div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8 text-center transition-all border-t-8 border-t-slate-800">
-                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">🔐</div><h3 class="font-bold text-xl text-slate-800 mb-2 font-extrabold uppercase tracking-tight">Sistem Pentadbir</h3><div class="space-y-3 mt-6 text-left"><label class="block text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">ID Pengguna</label><input type="text" id="admUser" class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"><label class="block text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Kata Laluan</label><input type="password" id="admPass" class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"><p id="loginErr" class="hidden text-xs text-red-500 font-bold mt-2">Maklumat log masuk tidak sah.</p></div><div class="mt-8 flex gap-3"><button onclick="attemptLogin()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 shadow-md active:scale-95 transition-all">Masuk</button><button onclick="closeModal('loginModal')" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-lg font-bold hover:bg-slate-200 transition-all">Batal</button></div>
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">🔐</div><h3 class="font-extrabold text-xl text-slate-800 mb-2 uppercase tracking-tight">Log Masuk Pentadbir</h3><div class="space-y-4 mt-6 text-left"><div class="space-y-1"><label class="block text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Username</label><input type="text" id="admUser" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"></div><div class="space-y-1"><label class="block text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Password</label><input type="password" id="admPass" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"></div><p id="loginErr" class="hidden text-[10px] text-red-500 font-black mt-2 text-center uppercase tracking-widest">Ralat: Maklumat Salah.</p></div><div class="mt-8 flex gap-3"><button onclick="attemptLogin()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-black uppercase tracking-widest hover:bg-blue-700 shadow-md active:scale-95 transition-all">Masuk</button><button onclick="closeModal('loginModal')" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all">Batal</button></div>
             </div>
         </div>
     </div>
@@ -392,10 +399,9 @@
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            const statusEl = document.getElementById('systemStatus');
             if(user) {
-                statusEl.textContent = "SISTEM AKTIF";
-                statusEl.className = "px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase tracking-tighter transition-all";
+                document.getElementById('systemStatus').textContent = "SISTEM AKTIF";
+                document.getElementById('systemStatus').className = "px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase tracking-tighter";
                 startSettingsListener();
                 startDataListener(); 
             }
@@ -412,8 +418,6 @@
                 } else {
                     setDoc(settingsDocRef, meetingSettings).catch(e => console.error("Initial Settings Error:", e));
                 }
-            }, (error) => {
-                console.error("Settings Listen Error:", error);
             });
         }
 
@@ -437,6 +441,7 @@
             dates.forEach(el => el.textContent = formattedLong);
             shortDates.forEach(el => el.textContent = formattedShort);
 
+            // Guna maklumat terkini untuk PDF jika sedang di dashboard
             if (document.getElementById('adminPanel').classList.contains('hidden')) {
                 refreshPrintHeader(meetingSettings.title, meetingSettings.year, formattedLong, meetingSettings.time, meetingSettings.venue);
             }
@@ -448,6 +453,7 @@
             document.getElementById('setMeetingVenue').value = meetingSettings.venue;
 
             updateDashboard();
+            renderArchiveList(); // Refresh list to update "Sesi Aktif" folder
         }
 
         function refreshPrintHeader(title, year, date, time, venue) {
@@ -514,16 +520,7 @@
             btn.disabled = true; spin.classList.remove('hidden');
             try {
                 const finalPosition = (inpPos.value === "Lain-lain") ? inpOtherPos.value : inpPos.value;
-                const payload = { 
-                    name: document.getElementById('inpName').value, 
-                    memberNo: document.getElementById('inpMemberNo').value,
-                    position: finalPosition, 
-                    phone: document.getElementById('inpPhone').value, 
-                    email: document.getElementById('inpEmail').value, 
-                    signature: canvas.toDataURL(), 
-                    createdAt: serverTimestamp(), 
-                    userId: currentUser.uid 
-                };
+                const payload = { name: document.getElementById('inpName').value, memberNo: document.getElementById('inpMemberNo').value, position: finalPosition, phone: document.getElementById('inpPhone').value, email: document.getElementById('inpEmail').value, signature: canvas.toDataURL(), createdAt: serverTimestamp(), userId: currentUser.uid };
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), payload);
                 closeModal('regModal'); e.target.reset(); otherPosContainer.classList.add('hidden'); ctx.clearRect(0,0, canvas.width, canvas.height);
                 alert("Kehadiran berjaya dihantar. Terima kasih.");
@@ -550,23 +547,34 @@
                 await setDoc(docRef, newSettings);
                 alert("Tetapan mesyuarat telah dikemas kini!");
             } catch (err) {
-                console.error("Firebase Save Error:", err);
-                alert("Gagal mengemas kini tetapan.");
+                console.error("Save Error:", err);
+                alert("Gagal mengemas kini tetapan. Sila pastikan Rules Firebase anda betul.");
             } finally { btn.disabled = false; spin.classList.add('hidden'); }
         };
 
         function renderArchiveList() {
             const container = document.getElementById('archiveListContainer');
+            if (!container) return;
             container.innerHTML = '';
-            const dates = [...new Set(attendanceDataRaw.map(item => {
+            
+            // Ambil semua tarikh dari data pendaftaran
+            let dates = [...new Set(attendanceDataRaw.map(item => {
                 if(!item.createdAt) return null;
-                return new Date(item.createdAt.seconds * 1000).toISOString().split('T')[0];
-            }))].filter(Boolean).sort((a,b) => b.localeCompare(a));
+                try { return new Date(item.createdAt.seconds * 1000).toISOString().split('T')[0]; } catch(e) { return null; }
+            }))].filter(Boolean);
+
+            // SENTIASA masukkan tarikh sesi aktif jika belum ada pendaftaran
+            if (!dates.includes(meetingSettings.date)) {
+                dates.push(meetingSettings.date);
+            }
+
+            // Susun tarikh terbaru di atas
+            dates.sort((a,b) => b.localeCompare(a));
 
             dates.forEach(dateStr => {
                 const isCurrent = dateStr === meetingSettings.date;
                 const d = new Date(dateStr);
-                const display = d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
+                const display = isNaN(d.getTime()) ? dateStr : d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
                 
                 let archiveTitle = isCurrent ? meetingSettings.title : (dateStr === "2025-12-30" ? "Mesyuarat ALK Bil 01/2025" : "Rekod Kehadiran");
                 let archiveYear = isCurrent ? meetingSettings.year : d.getFullYear();
@@ -574,9 +582,20 @@
                 let archiveVenue = isCurrent ? meetingSettings.venue : "657 JALAN STESEN, SUNGAI BAKAP";
 
                 const card = document.createElement('div');
-                card.className = `archive-card glass-card p-6 rounded-2xl flex items-center gap-6 border-l-4 ${isCurrent ? 'border-l-blue-600' : 'border-l-slate-300'} shadow-sm`;
+                card.className = `archive-card glass-card p-6 rounded-2xl flex items-center gap-6 border-l-4 ${isCurrent ? 'border-l-blue-600 bg-blue-50/20' : 'border-l-slate-300'} shadow-sm`;
                 card.onclick = () => showMeetingDetails(dateStr, archiveTitle, archiveYear, display, archiveTime, archiveVenue);
-                card.innerHTML = `<div class="w-12 h-12 ${isCurrent ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'} rounded-xl flex items-center justify-center text-2xl shadow-inner">${isCurrent ? '📅' : '📁'}</div><div class="flex-grow"><h4 class="font-extrabold text-slate-800 text-base uppercase leading-tight">${archiveTitle}</h4><div class="flex flex-wrap gap-x-4 mt-1 text-[10px] text-slate-500 font-bold uppercase tracking-tighter"><span>📅 ${display}</span>${isCurrent ? '<span class="text-blue-600 bg-blue-50 px-2 rounded-full border border-blue-100">Sesi Aktif</span>' : ''}</div></div><div class="text-slate-300 text-xl">➜</div>`;
+                
+                card.innerHTML = `
+                    <div class="w-12 h-12 ${isCurrent ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'} rounded-xl flex items-center justify-center text-2xl shadow-inner">${isCurrent ? '📅' : '📁'}</div>
+                    <div class="flex-grow">
+                        <h4 class="font-extrabold text-slate-800 text-base uppercase leading-tight">${archiveTitle}</h4>
+                        <div class="flex flex-wrap gap-x-4 mt-1 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                            <span>📅 ${display}</span>
+                            ${isCurrent ? '<span class="text-blue-600 bg-blue-50 px-2 rounded-full border border-blue-100">Sesi Aktif</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="text-slate-300 text-xl group-hover:translate-x-1 transition-transform">➜</div>
+                `;
                 container.appendChild(card);
             });
         }
@@ -590,21 +609,27 @@
                 return d.toISOString().split('T')[0] === activeAdminDateFilter;
             });
             filtered.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-            if(filtered.length === 0) { document.getElementById('noDataMsg').classList.remove('hidden'); return; }
+            
+            if(filtered.length === 0) { 
+                document.getElementById('noDataMsg').classList.remove('hidden'); 
+                return; 
+            }
             document.getElementById('noDataMsg').classList.add('hidden');
+            
             filtered.forEach((item, i) => { 
-                const tr = document.createElement('tr'); tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors"; 
+                const tr = document.createElement('tr'); 
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors"; 
                 tr.innerHTML = `
-                    <td class="py-3 px-4 text-center font-mono text-xs text-slate-400 font-bold">${i + 1}</td>
-                    <td class="py-3 px-4 font-bold text-slate-700">${item.name}</td>
-                    <td class="py-3 px-4 text-center font-mono text-xs text-blue-600 font-bold">${item.memberNo || '-'}</td>
-                    <td class="py-3 px-4"><span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-tighter">${item.position}</span></td>
-                    <td class="py-3 px-4 text-xs font-medium"><div class="text-slate-800">${item.phone}</div><div class="text-slate-400 font-normal lowercase">${item.email}</div></td>
-                    <td class="py-3 px-4 text-center">
-                        <img src="${item.signature}" class="h-10 mx-auto border border-slate-200 bg-white rounded shadow-sm hover:scale-150 transition-transform">
+                    <td class="py-4 px-4 text-center font-mono text-xs text-slate-400 font-black">${i + 1}</td>
+                    <td class="py-4 px-4 font-bold text-slate-800">${item.name}</td>
+                    <td class="py-4 px-4 text-center font-mono text-xs text-blue-600 font-black">${item.memberNo || '-'}</td>
+                    <td class="py-4 px-4"><span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-1 rounded-full font-black uppercase tracking-tighter">${item.position}</span></td>
+                    <td class="py-4 px-4 text-xs font-medium"><div class="text-slate-800">${item.phone}</div><div class="text-slate-400 font-normal lowercase">${item.email}</div></td>
+                    <td class="py-4 px-4 text-center">
+                        <img src="${item.signature}" class="h-10 mx-auto border border-slate-200 bg-white rounded shadow-sm hover:scale-[2.5] transition-transform cursor-zoom-in origin-center relative z-10">
                     </td>
-                    <td class="py-3 px-4 text-right no-print">
-                        <button onclick="window.delEntry('${item.id}')" class="text-slate-300 hover:text-red-500 transition-colors">🗑</button>
+                    <td class="py-4 px-4 text-right no-print">
+                        <button onclick="window.delEntry('${item.id}')" class="p-2 text-slate-300 hover:text-red-500 transition-colors">🗑</button>
                     </td>
                 `;
                 tbody.appendChild(tr); 
@@ -622,12 +647,20 @@
             const archSec = document.getElementById('meetingArchiveSection'); const setSec = document.getElementById('adminSettingsSection');
             const detailSec = document.getElementById('detailedRecordView');
             
+            // Bila tukar tab, reset pengepala PDF ke tetapan semasa
             const d = new Date(meetingSettings.date);
             const formattedLong = isNaN(d.getTime()) ? meetingSettings.date : d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
             refreshPrintHeader(meetingSettings.title, meetingSettings.year, formattedLong, meetingSettings.time, meetingSettings.venue);
 
-            if(tab === 'archive') { archBtn.className = "px-6 py-3 font-bold text-sm uppercase tracking-wider tab-active"; setBtn.className = "px-6 py-3 font-bold text-sm uppercase tracking-wider tab-inactive"; archSec.classList.remove('hidden'); setSec.classList.add('hidden'); detailSec.classList.add('hidden'); } 
-            else { setBtn.className = "px-6 py-3 font-bold text-sm uppercase tracking-wider tab-active"; archBtn.className = "px-6 py-3 font-bold text-sm uppercase tracking-wider tab-inactive"; setSec.classList.remove('hidden'); archSec.classList.add('hidden'); detailSec.classList.add('hidden'); }
+            if(tab === 'archive') { 
+                archBtn.className = "flex-1 px-6 py-4 font-bold text-xs uppercase tracking-widest tab-active transition-all"; 
+                setBtn.className = "flex-1 px-6 py-4 font-bold text-xs uppercase tracking-widest tab-inactive transition-all"; 
+                archSec.classList.remove('hidden'); setSec.classList.add('hidden'); detailSec.classList.add('hidden'); 
+            } else { 
+                setBtn.className = "flex-1 px-6 py-4 font-bold text-xs uppercase tracking-widest tab-active transition-all"; 
+                archBtn.className = "flex-1 px-6 py-4 font-bold text-xs uppercase tracking-widest tab-inactive transition-all"; 
+                setSec.classList.remove('hidden'); archSec.classList.add('hidden'); detailSec.classList.add('hidden'); 
+            }
         };
 
         window.showMeetingDetails = (dateStr, title, year, displayDate, time, venue) => {
