@@ -39,17 +39,17 @@
             body { background: white; padding: 0; }
             .glass-card { box-shadow: none; border: none !important; width: 100%; }
             main { margin-top: 0 !important; }
-            table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-            th, td { border: 1px solid #cbd5e1 !important; padding: 8px !important; }
+            table { width: 100%; border-collapse: collapse; margin-top: 1rem; table-layout: auto; }
+            th, td { border: 1px solid #cbd5e1 !important; padding: 6px !important; font-size: 0.75rem; }
             th { background-color: #f1f5f9 !important; }
-            img { max-height: 80px !important; }
-            @page { margin: 1.5cm; }
+            img { max-height: 50px !important; }
+            @page { margin: 1cm; size: A4; }
             .print-details {
                 text-align: left;
                 display: inline-block;
                 margin: 1rem auto;
-                font-size: 0.9rem;
-                line-height: 1.6;
+                font-size: 0.8rem;
+                line-height: 1.4;
             }
             #meetingArchiveSection, #adminSettingsSection { display: none !important; }
             #detailedRecordView { display: block !important; }
@@ -82,8 +82,8 @@
         <h2 class="text-lg font-semibold">Koperasi Adham Al-Husainy Berhad Tahun <span id="printMeetingYear">2026</span></h2>
         
         <div class="print-details border-t border-b border-slate-300 py-2 mt-4 px-4">
-            <div><strong>TARIKH:</strong> <span id="printMeetingDate">09 JANUARI 2026</span></div>
-            <div><strong>MASA:</strong> <span id="printMeetingTime">08:30 MALAM</span></div>
+            <div id="printDate"><strong>TARIKH:</strong> 09 JANUARI 2026</div>
+            <div id="printTime"><strong>MASA:</strong> 20:30 (8:30 MALAM)</div>
             <div><strong>TEMPAT:</strong> <span id="printMeetingVenue">657 JALAN STESEN, SUNGAI BAKAP, 14200 SUNGAI JAWI</span></div>
         </div>
         
@@ -94,7 +94,7 @@
     <header class="bg-slate-900 text-white pb-24 pt-12 px-4 no-print relative overflow-hidden">
         <div class="absolute top-0 right-0 opacity-10 text-[200px] font-bold leading-none select-none pointer-events-none tracking-tighter dyn-meeting-year">2026</div>
         <div class="max-w-5xl mx-auto text-center relative z-10">
-            <div class="inline-block p-4 bg-white rounded-2xl shadow-xl mb-6 shadow-blue-900/20">
+            <div class="inline-block p-4 bg-white rounded-2xl shadow-xl mb-6 shadow-blue-900/20 transition-transform hover:scale-105">
                 <img src="https://i.postimg.cc/yNSrvgJJ/Logo-Koperasi-Adham-Al-Husainy-Berhad.png" 
                      alt="Logo Koperasi" class="h-20 md:h-24 object-contain">
             </div>
@@ -192,7 +192,7 @@
                 <div class="glass-card p-8 rounded-2xl space-y-6">
                     <div class="border-b pb-4">
                         <h3 class="font-extrabold text-slate-800 text-lg uppercase tracking-tight">⚙️ Tetapan Mesyuarat Semasa</h3>
-                        <p class="text-xs text-slate-500 mt-1 uppercase tracking-tight">Perubahan di sini akan dikemas kini pada Dashboard dan PDF rekod pendaftaran semasa.</p>
+                        <p class="text-xs text-slate-500 mt-1 uppercase tracking-tight font-bold">Nota: Sila pastikan Security Rules di Firebase membenarkan akses ke koleksi 'settings'.</p>
                     </div>
                     
                     <form id="meetingSettingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -256,6 +256,7 @@
                                 <tr class="text-xs font-bold text-slate-500 uppercase bg-slate-50 border-y border-slate-200">
                                     <th class="py-3 px-4 text-center" style="width: 50px;">Bil</th>
                                     <th class="py-3 px-4">Nama Penuh</th>
+                                    <th class="py-3 px-4 text-center">No. Ahli</th>
                                     <th class="py-3 px-4">Jawatan</th>
                                     <th class="py-3 px-4">Hubungan (Tel/Email)</th>
                                     <th class="py-3 px-4 text-center">T/Tangan</th>
@@ -291,7 +292,11 @@
                 <form id="attendForm" class="p-6 space-y-4">
                     <div>
                         <label class="block text-sm font-bold text-slate-500 uppercase mb-1">Nama Penuh</label>
-                        <input type="text" id="inpName" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-inner" placeholder="Nama penuh anda">
+                        <input type="text" id="inpName" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-inner" placeholder="Masukkan nama penuh anda">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-500 uppercase mb-1">Nombor Ahli Koperasi</label>
+                        <input type="text" id="inpMemberNo" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-inner" placeholder="Cth: K1234 atau 055">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-slate-500 uppercase mb-1">Jawatan</label>
@@ -309,7 +314,7 @@
                     </div>
                     <div id="otherPosContainer" class="hidden animate-fade-in">
                         <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Sila Nyatakan Jawatan</label>
-                        <input type="text" id="inpOtherPos" class="w-full px-4 py-2 bg-blue-50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Contoh: Pengurus">
+                        <input type="text" id="inpOtherPos" class="w-full px-4 py-2 bg-blue-50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none shadow-inner" placeholder="Contoh: Pengurus">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div><label class="block text-sm font-bold text-slate-500 uppercase mb-1">No. Telefon</label><input type="tel" id="inpPhone" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none shadow-inner" placeholder="01x-xxxxxxx"></div>
@@ -432,7 +437,6 @@
             dates.forEach(el => el.textContent = formattedLong);
             shortDates.forEach(el => el.textContent = formattedShort);
 
-            // JIKA sedang di dashboard, pastikan pengepala PDF guna tetapan terbaru
             if (document.getElementById('adminPanel').classList.contains('hidden')) {
                 refreshPrintHeader(meetingSettings.title, meetingSettings.year, formattedLong, meetingSettings.time, meetingSettings.venue);
             }
@@ -510,7 +514,16 @@
             btn.disabled = true; spin.classList.remove('hidden');
             try {
                 const finalPosition = (inpPos.value === "Lain-lain") ? inpOtherPos.value : inpPos.value;
-                const payload = { name: document.getElementById('inpName').value, position: finalPosition, phone: document.getElementById('inpPhone').value, email: document.getElementById('inpEmail').value, signature: canvas.toDataURL(), createdAt: serverTimestamp(), userId: currentUser.uid };
+                const payload = { 
+                    name: document.getElementById('inpName').value, 
+                    memberNo: document.getElementById('inpMemberNo').value,
+                    position: finalPosition, 
+                    phone: document.getElementById('inpPhone').value, 
+                    email: document.getElementById('inpEmail').value, 
+                    signature: canvas.toDataURL(), 
+                    createdAt: serverTimestamp(), 
+                    userId: currentUser.uid 
+                };
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), payload);
                 closeModal('regModal'); e.target.reset(); otherPosContainer.classList.add('hidden'); ctx.clearRect(0,0, canvas.width, canvas.height);
                 alert("Kehadiran berjaya dihantar. Terima kasih.");
@@ -555,7 +568,6 @@
                 const d = new Date(dateStr);
                 const display = d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
                 
-                // Tajuk untuk arkib lama
                 let archiveTitle = isCurrent ? meetingSettings.title : (dateStr === "2025-12-30" ? "Mesyuarat ALK Bil 01/2025" : "Rekod Kehadiran");
                 let archiveYear = isCurrent ? meetingSettings.year : d.getFullYear();
                 let archiveTime = isCurrent ? meetingSettings.time : "08:30 Malam";
@@ -582,7 +594,19 @@
             document.getElementById('noDataMsg').classList.add('hidden');
             filtered.forEach((item, i) => { 
                 const tr = document.createElement('tr'); tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors"; 
-                tr.innerHTML = `<td class="py-3 px-4 text-center font-mono text-xs text-slate-400 font-bold">${i + 1}</td><td class="py-3 px-4 font-bold text-slate-700">${item.name}</td><td class="py-3 px-4"><span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-tighter">${item.position}</span></td><td class="py-3 px-4 text-xs font-medium"><div class="text-slate-800">${item.phone}</div><div class="text-slate-400 font-normal lowercase">${item.email}</div></td><td class="py-3 px-4 text-center"><img src="${item.signature}" class="h-10 mx-auto border border-slate-200 bg-white rounded shadow-sm hover:scale-150 transition-transform"></td><td class="py-3 px-4 text-right no-print"><button onclick="window.delEntry('${item.id}')" class="text-slate-300 hover:text-red-500 transition-colors">🗑</button></td>`;
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-mono text-xs text-slate-400 font-bold">${i + 1}</td>
+                    <td class="py-3 px-4 font-bold text-slate-700">${item.name}</td>
+                    <td class="py-3 px-4 text-center font-mono text-xs text-blue-600 font-bold">${item.memberNo || '-'}</td>
+                    <td class="py-3 px-4"><span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-tighter">${item.position}</span></td>
+                    <td class="py-3 px-4 text-xs font-medium"><div class="text-slate-800">${item.phone}</div><div class="text-slate-400 font-normal lowercase">${item.email}</div></td>
+                    <td class="py-3 px-4 text-center">
+                        <img src="${item.signature}" class="h-10 mx-auto border border-slate-200 bg-white rounded shadow-sm hover:scale-150 transition-transform">
+                    </td>
+                    <td class="py-3 px-4 text-right no-print">
+                        <button onclick="window.delEntry('${item.id}')" class="text-slate-300 hover:text-red-500 transition-colors">🗑</button>
+                    </td>
+                `;
                 tbody.appendChild(tr); 
             });
         }
@@ -598,9 +622,8 @@
             const archSec = document.getElementById('meetingArchiveSection'); const setSec = document.getElementById('adminSettingsSection');
             const detailSec = document.getElementById('detailedRecordView');
             
-            // Bila tukar tab, reset pengepala PDF ke tetapan semasa
             const d = new Date(meetingSettings.date);
-            const formattedLong = d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            const formattedLong = isNaN(d.getTime()) ? meetingSettings.date : d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
             refreshPrintHeader(meetingSettings.title, meetingSettings.year, formattedLong, meetingSettings.time, meetingSettings.venue);
 
             if(tab === 'archive') { archBtn.className = "px-6 py-3 font-bold text-sm uppercase tracking-wider tab-active"; setBtn.className = "px-6 py-3 font-bold text-sm uppercase tracking-wider tab-inactive"; archSec.classList.remove('hidden'); setSec.classList.add('hidden'); detailSec.classList.add('hidden'); } 
@@ -610,10 +633,7 @@
         window.showMeetingDetails = (dateStr, title, year, displayDate, time, venue) => {
             activeAdminDateFilter = dateStr;
             document.getElementById('viewHeaderTitle').textContent = `${title} (${displayDate})`;
-            
-            // TUKAR PENGEPALA PDF IKUT KONTEKS ARKIB
             refreshPrintHeader(title, year, displayDate.toUpperCase(), time, venue);
-            
             document.getElementById('meetingArchiveSection').classList.add('hidden');
             document.getElementById('detailedRecordView').classList.remove('hidden');
             renderAdminTable();
@@ -622,10 +642,8 @@
         window.hideMeetingDetails = () => {
             document.getElementById('detailedRecordView').classList.add('hidden');
             document.getElementById('meetingArchiveSection').classList.remove('hidden');
-            
-            // Reset PDF header balik ke tetapan semasa
             const d = new Date(meetingSettings.date);
-            const formattedLong = d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            const formattedLong = isNaN(d.getTime()) ? meetingSettings.date : d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
             refreshPrintHeader(meetingSettings.title, meetingSettings.year, formattedLong, meetingSettings.time, meetingSettings.venue);
         };
 
